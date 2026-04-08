@@ -16,22 +16,10 @@ JOYBOY
         
         body {
             font-family: 'Rajdhani', sans-serif;
-            background: #0a0a0a;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%);
             color: #ffffff;
             padding: 20px;
             min-height: 100vh;
-        }
-        
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 20% 30%, rgba(255, 50, 50, 0.15) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: -1;
         }
         
         .container {
@@ -42,15 +30,16 @@ JOYBOY
         header {
             text-align: center;
             padding: 30px;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
             border: 1px solid #ff4444;
-            border-radius: 15px;
+            border-radius: 20px;
             margin-bottom: 30px;
         }
         
         h1 {
             font-family: 'Orbitron', monospace;
-            color: #ff4444;
+            color: #ff6666;
             font-size: 2em;
         }
         
@@ -58,7 +47,7 @@ JOYBOY
             background: #ff4444;
             border: none;
             padding: 10px 20px;
-            border-radius: 8px;
+            border-radius: 30px;
             color: white;
             font-weight: bold;
             cursor: pointer;
@@ -73,7 +62,8 @@ JOYBOY
         .login-box {
             max-width: 400px;
             margin: 100px auto;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
             border: 1px solid #ff4444;
             padding: 40px;
             border-radius: 20px;
@@ -86,22 +76,23 @@ JOYBOY
             letter-spacing: 10px;
             width: 200px;
             margin: 20px auto;
-            background: black;
+            background: rgba(0,0,0,0.6);
             border: 1px solid #ff4444;
             color: white;
             padding: 10px;
+            border-radius: 10px;
         }
         
         .clan-card {
             background: rgba(255,68,68,0.05);
             border: 1px solid rgba(255,68,68,0.3);
             padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
+            border-radius: 12px;
+            margin-bottom: 15px;
         }
         
         input, textarea {
-            background: black;
+            background: rgba(0,0,0,0.6);
             border: 1px solid #ff4444;
             padding: 10px;
             color: white;
@@ -118,8 +109,8 @@ JOYBOY
         
         .current-scores span {
             background: rgba(255,68,68,0.2);
-            padding: 5px 10px;
-            border-radius: 8px;
+            padding: 5px 12px;
+            border-radius: 20px;
         }
         
         .delete-btn {
@@ -129,6 +120,32 @@ JOYBOY
         .error {
             color: #ff8888;
             margin-top: 10px;
+        }
+        
+        .add-clan-form {
+            background: rgba(255,68,68,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,68,68,0.3);
+        }
+        
+        .add-clan-form input, .add-clan-form textarea {
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        h2 {
+            color: #ff6666;
+            margin: 20px 0 15px;
+            font-family: 'Orbitron', monospace;
+            border-left: 3px solid #ff4444;
+            padding-left: 15px;
+        }
+        
+        h3 {
+            color: #ff6666;
+            margin: 15px 0 10px;
         }
     </style>
 </head>
@@ -140,7 +157,7 @@ JOYBOY
             <input type="password" id="pinCode" class="pin-input" maxlength="4" pattern="[0-9]{4}" inputmode="numeric" placeholder="****">
             <button onclick="checkPin()">Se connecter</button>
             <div id="loginError" class="error"></div>
-            <a href="index.html" style="color:#ff4444; display:block; margin-top:20px;">← Retour au site</a>
+            <a href="index.html" style="color:#ff6666; display:block; margin-top:20px;">← Retour au site</a>
         </div>
 
         <div id="adminPanel" style="display:none;">
@@ -151,10 +168,22 @@ JOYBOY
                 <a href="index.html"><button>🏠 Voir le site</button></a>
             </header>
 
-            <h2 style="color:#ff4444; margin:20px 0 10px;">📋 GESTION DES CLANS</h2>
+            <!-- Formulaire pour ajouter un nouveau clan -->
+            <div class="add-clan-form">
+                <h2>📝 ENREGISTRER UN NOUVEAU CLAN</h2>
+                <input type="text" id="newClanName" placeholder="Nom du clan" style="width:100%;">
+                <input type="text" id="newClanLeader" placeholder="Nom du chef" style="width:100%;">
+                <textarea id="newClanDesc" placeholder="Description du clan" rows="2" style="width:100%;"></textarea>
+                <button onclick="addNewClan()" style="background:#27ae60;">✅ AJOUTER CE CLAN</button>
+            </div>
+
+            <!-- Liste des clans existants -->
+            <h2>📋 LISTE DES CLANS</h2>
             <div id="clansList"></div>
 
-            <h2 style="color:#ff4444; margin:20px 0 10px;">⭐ AJOUTER DES POINTS</h2>
+            <!-- Ajout de points -->
+            <h2>⭐ AJOUTER DES POINTS</h2>
+            <p style="margin-bottom:15px;">⚠️ Les points s'ajoutent automatiquement aux 3 classements (Semaine, Mois, Année)</p>
             <div id="scoreInputs"></div>
         </div>
     </div>
@@ -205,16 +234,49 @@ JOYBOY
             displayAdmin();
         }
         
+        // Ajouter un nouveau clan
+        function addNewClan() {
+            const name = document.getElementById('newClanName').value;
+            const leader = document.getElementById('newClanLeader').value;
+            const description = document.getElementById('newClanDesc').value;
+            
+            if(!name || !leader) {
+                alert('❌ Veuillez entrer au moins le nom du clan et le chef');
+                return;
+            }
+            
+            const newClan = {
+                id: Date.now(),
+                name: name,
+                leader: leader,
+                description: description || "",
+                score_week: 0,
+                score_month: 0,
+                score_year: 0,
+                created_at: new Date().toISOString()
+            };
+            
+            currentData.clans.push(newClan);
+            saveData();
+            
+            // Réinitialiser le formulaire
+            document.getElementById('newClanName').value = '';
+            document.getElementById('newClanLeader').value = '';
+            document.getElementById('newClanDesc').value = '';
+            
+            alert(`✅ Clan "${name}" ajouté avec succès !`);
+        }
+        
         function displayAdmin() {
             // Liste des clans avec bouton supprimer
             const clansContainer = document.getElementById('clansList');
             if(currentData.clans.length === 0) {
-                clansContainer.innerHTML = '<p>Aucun clan enregistré.</p>';
+                clansContainer.innerHTML = '<p>Aucun clan enregistré. Utilisez le formulaire ci-dessus pour en ajouter.</p>';
             } else {
                 clansContainer.innerHTML = currentData.clans.map(clan => `
                     <div class="clan-card">
                         <strong>⚔️ ${escapeHtml(clan.name)}</strong> - Chef: ${escapeHtml(clan.leader)}<br>
-                        📝 ${escapeHtml(clan.description)}<br>
+                        📝 ${escapeHtml(clan.description) || "Aucune description"}<br>
                         📅 Créé le: ${new Date(clan.created_at).toLocaleDateString()}<br>
                         <button onclick="deleteClan(${clan.id})" class="delete-btn">🗑️ SUPPRIMER CE CLAN</button>
                     </div>
@@ -224,7 +286,7 @@ JOYBOY
             // Ajout de points
             const scoreContainer = document.getElementById('scoreInputs');
             if(currentData.clans.length === 0) {
-                scoreContainer.innerHTML = '<p>Créez d\'abord des clans.</p>';
+                scoreContainer.innerHTML = '<p>Créez d\'abord des clans avec le formulaire ci-dessus.</p>';
             } else {
                 scoreContainer.innerHTML = currentData.clans.map(clan => `
                     <div class="clan-card">
@@ -234,7 +296,7 @@ JOYBOY
                             <span>📆 MOIS: ${clan.score_month || 0} pts</span>
                             <span>🗓️ ANNÉE: ${clan.score_year || 0} pts</span>
                         </div>
-                        <div style="margin-top:10px;">
+                        <div style="margin-top:15px;">
                             <input type="number" id="points_${clan.id}" placeholder="Points à ajouter" style="width:150px;">
                             <button onclick="addPoints(${clan.id})">➕ AJOUTER AUX 3 CLASSEMENTS</button>
                         </div>
@@ -266,7 +328,7 @@ JOYBOY
                 }
                 input.value = '';
             } else {
-                alert('❌ Entrez un nombre valide');
+                alert('❌ Entrez un nombre valide (supérieur à 0)');
             }
         }
         
@@ -282,3 +344,4 @@ JOYBOY
     </script>
 </body>
 </html>
+joyboy
