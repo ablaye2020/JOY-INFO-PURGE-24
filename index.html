@@ -1,0 +1,575 @@
+INFO PURGE 24
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INFO PURGE 24 - Classement des Clans</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            padding: 20px;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        /* Effet de fond mystérieux */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255, 50, 50, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(50, 50, 255, 0.1) 0%, transparent 50%),
+                repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 2px, transparent 2px, transparent 8px);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Header avec effet live */
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .live-badge {
+            display: inline-block;
+            background: #ff0000;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            animation: pulse 1.5s infinite;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,0,0,0.7); }
+            70% { opacity: 0.8; box-shadow: 0 0 0 10px rgba(255,0,0,0); }
+            100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,0,0,0); }
+        }
+        
+        h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 3.5em;
+            font-weight: 900;
+            letter-spacing: 5px;
+            background: linear-gradient(135deg, #ffffff, #ff4444, #ffffff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 30px rgba(255,68,68,0.3);
+            margin-bottom: 10px;
+        }
+        
+        .citation {
+            font-style: italic;
+            font-size: 1.1em;
+            color: #ff4444;
+            letter-spacing: 2px;
+            margin-top: 15px;
+            border-top: 1px solid rgba(255,68,68,0.3);
+            border-bottom: 1px solid rgba(255,68,68,0.3);
+            display: inline-block;
+            padding: 10px 20px;
+        }
+        
+        /* Navigation */
+        nav {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        
+        nav button {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,68,68,0.5);
+            padding: 12px 28px;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+        
+        nav button:hover {
+            background: #ff4444;
+            border-color: #ff4444;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255,68,68,0.3);
+        }
+        
+        /* Sections */
+        .section {
+            background: rgba(10,10,10,0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,68,68,0.2);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section h2 {
+            font-family: 'Orbitron', monospace;
+            color: #ff4444;
+            margin-bottom: 20px;
+            border-left: 4px solid #ff4444;
+            padding-left: 15px;
+        }
+        
+        /* Classement */
+        .ranking-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .ranking-tab {
+            background: rgba(255,68,68,0.1);
+            border: 1px solid rgba(255,68,68,0.3);
+            padding: 8px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .ranking-tab:hover {
+            background: rgba(255,68,68,0.3);
+        }
+        
+        .ranking-tab.active {
+            background: #ff4444;
+            border-color: #ff4444;
+        }
+        
+        .ranking-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px;
+            background: linear-gradient(90deg, rgba(255,68,68,0.1) 0%, rgba(255,68,68,0) 100%);
+            margin: 10px 0;
+            border-radius: 10px;
+            border-left: 3px solid #ff4444;
+            flex-wrap: wrap;
+            gap: 15px;
+            transition: all 0.3s;
+        }
+        
+        .ranking-item:hover {
+            transform: translateX(5px);
+            background: linear-gradient(90deg, rgba(255,68,68,0.2) 0%, rgba(255,68,68,0) 100%);
+        }
+        
+        .ranking-number {
+            font-family: 'Orbitron', monospace;
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff4444;
+            min-width: 60px;
+        }
+        
+        .ranking-name {
+            flex: 2;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .ranking-leader {
+            flex: 1;
+            color: #aaaaaa;
+        }
+        
+        .ranking-score {
+            flex: 1;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #ff4444;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        /* Formulaires */
+        form input, form textarea {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid rgba(255,68,68,0.3);
+            background: rgba(0,0,0,0.6);
+            color: white;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1em;
+        }
+        
+        form input:focus, form textarea:focus {
+            outline: none;
+            border-color: #ff4444;
+        }
+        
+        button {
+            background: #ff4444;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        button:hover {
+            background: #cc0000;
+            transform: scale(1.02);
+        }
+        
+        /* Messages */
+        .message {
+            background: rgba(255,68,68,0.05);
+            border: 1px solid rgba(255,68,68,0.2);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+        }
+        
+        .like-btn {
+            background: rgba(255,255,255,0.1);
+            padding: 5px 12px;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        
+        .like-btn:hover {
+            background: #ff4444;
+        }
+        
+        .success {
+            color: #44ff44;
+            margin-top: 10px;
+        }
+        
+        /* Admin link */
+        .admin-link {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #ff4444;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 12px;
+            color: #ff4444;
+            text-decoration: none;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+        
+        .admin-link:hover {
+            background: #ff4444;
+            color: black;
+        }
+        
+        /* Musique */
+        .music-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #ff4444;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+        
+        .refresh-btn {
+            background: rgba(255,68,68,0.2);
+            border: 1px solid #ff4444;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 2em; letter-spacing: 2px; }
+            .ranking-item { flex-direction: column; text-align: center; }
+            .ranking-number { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="admin.html" class="admin-link">⚡ JOYBOY ADMIN</a>
+        <div class="music-control" onclick="toggleMusic()" id="musicBtn">🎵</div>
+        
+        <header>
+            <div class="live-badge">🔴 LIVE</div>
+            <h1>⚡ INFO PURGE 24 ⚡</h1>
+            <div class="citation">"Le respect ne se demande pas, il s'impose" - Joyboy</div>
+            <nav>
+                <button onclick="showSection('ranking')">🏆 CLASSEMENT</button>
+                <button onclick="showSection('forum')">💬 FORUM PURGE</button>
+            </nav>
+        </header>
+
+        <!-- Section Classement -->
+        <div id="ranking" class="section active">
+            <h2>🏆 CLASSEMENT DES CLANS</h2>
+            <button class="refresh-btn" onclick="loadData()">🔄 RAFRAÎCHIR</button>
+            <div class="ranking-tabs">
+                <div class="ranking-tab active" onclick="showRankingPeriod('week')">📅 SEMAINE</div>
+                <div class="ranking-tab" onclick="showRankingPeriod('month')">📆 MOIS</div>
+                <div class="ranking-tab" onclick="showRankingPeriod('year')">🗓️ ANNÉE</div>
+            </div>
+            <div id="rankingList">
+                <div style="text-align:center; padding:50px;">⏳ Chargement des données...</div>
+            </div>
+        </div>
+
+        <!-- Section Forum -->
+        <div id="forum" class="section">
+            <h2>💬 FORUM PURGE 24</h2>
+            <button class="refresh-btn" onclick="loadData()">🔄 RAFRAÎCHIR</button>
+            <form id="forumForm">
+                <input type="text" id="authorName" placeholder="Votre pseudo" required>
+                <textarea id="forumMessage" placeholder="Votre message" rows="3" required></textarea>
+                <button type="submit">📢 PUBLIER</button>
+            </form>
+            <div id="forumMessages">
+                <div style="text-align:center; padding:50px;">⏳ Chargement...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const STORAGE_KEY = "infopurge24_data";
+        let currentRankingPeriod = 'week';
+        let backgroundMusic = null;
+        let musicPlaying = false;
+        let globalData = {
+            clans: [],
+            forum: []
+        };
+        
+        // Charger les données
+        function loadData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                globalData = JSON.parse(saved);
+            }
+            if (!globalData.clans) globalData.clans = [];
+            if (!globalData.forum) globalData.forum = [];
+            
+            updateRanking();
+            updateForum();
+        }
+        
+        // Sauvegarder
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(globalData));
+        }
+        
+        // Mettre à jour le classement
+        function updateRanking() {
+            let clans = [...globalData.clans];
+            
+            if (currentRankingPeriod === 'week') {
+                clans.sort((a,b) => (b.score_week || 0) - (a.score_week || 0));
+            } else if (currentRankingPeriod === 'month') {
+                clans.sort((a,b) => (b.score_month || 0) - (a.score_month || 0));
+            } else {
+                clans.sort((a,b) => (b.score_year || 0) - (a.score_year || 0));
+            }
+            
+            const container = document.getElementById('rankingList');
+            if (clans.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:50px;">🏆 Aucun clan enregistré pour le moment.</div>';
+                return;
+            }
+            
+            let periodLabel = currentRankingPeriod === 'week' ? 'POINTS SEMAINE' : (currentRankingPeriod === 'month' ? 'POINTS MOIS' : 'POINTS ANNÉE');
+            
+            container.innerHTML = clans.map((clan, index) => {
+                let score = currentRankingPeriod === 'week' ? (clan.score_week || 0) : 
+                           (currentRankingPeriod === 'month' ? (clan.score_month || 0) : (clan.score_year || 0));
+                return `
+                    <div class="ranking-item">
+                        <span class="ranking-number">#${index+1}</span>
+                        <span class="ranking-name">⚔️ ${escapeHtml(clan.name)}</span>
+                        <span class="ranking-leader">👑 ${escapeHtml(clan.leader)}</span>
+                        <span class="ranking-score">⭐ ${score} ${periodLabel}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Mettre à jour le forum
+        function updateForum() {
+            const forum = globalData.forum || [];
+            const container = document.getElementById('forumMessages');
+            if (forum.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:50px;">💬 Soyez le premier à commenter !</div>';
+                return;
+            }
+            container.innerHTML = forum.map(msg => `
+                <div class="message">
+                    <strong>🔥 ${escapeHtml(msg.author)}</strong> <small>${msg.date}</small>
+                    <p style="margin-top:8px;">${escapeHtml(msg.message)}</p>
+                    <button class="like-btn" onclick="likeMessage(${msg.id})">❤️ ${msg.likes || 0} likes</button>
+                </div>
+            `).join('');
+        }
+        
+        // Liker
+        function likeMessage(id) {
+            const msg = globalData.forum.find(m => m.id == id);
+            if (msg) {
+                msg.likes = (msg.likes || 0) + 1;
+                saveData();
+                updateForum();
+                playSound('ding');
+            }
+        }
+        
+        // Son
+        function playSound(type) {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                oscillator.type = 'sine';
+                gainNode.gain.value = 0.2;
+                if(type === 'ding') {
+                    oscillator.frequency.value = 880;
+                    oscillator.start();
+                    gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.3);
+                }
+                setTimeout(() => {
+                    oscillator.stop();
+                    audioContext.close();
+                }, 300);
+            } catch(e) {}
+        }
+        
+        // Musique
+        function initMusic() {
+            try {
+                backgroundMusic = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3');
+                backgroundMusic.loop = true;
+                backgroundMusic.volume = 0.15;
+            } catch(e) {}
+        }
+        
+        function toggleMusic() {
+            if(!backgroundMusic) initMusic();
+            if(musicPlaying) {
+                backgroundMusic.pause();
+                musicPlaying = false;
+                document.getElementById('musicBtn').innerHTML = '🎵';
+            } else {
+                backgroundMusic.play().catch(e => console.log("Auto-play bloqué"));
+                musicPlaying = true;
+                document.getElementById('musicBtn').innerHTML = '🎵🔊';
+            }
+        }
+        
+        // Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            if(sectionId === 'ranking') updateRanking();
+            if(sectionId === 'forum') updateForum();
+        }
+        
+        function showRankingPeriod(period) {
+            currentRankingPeriod = period;
+            document.querySelectorAll('.ranking-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            updateRanking();
+        }
+        
+        // Forum - publication
+        document.getElementById('forumForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newMsg = {
+                id: Date.now(),
+                author: document.getElementById('authorName').value,
+                message: document.getElementById('forumMessage').value,
+                likes: 0,
+                date: new Date().toLocaleString()
+            };
+            globalData.forum.unshift(newMsg);
+            saveData();
+            playSound('ding');
+            updateForum();
+            e.target.reset();
+        });
+        
+        function escapeHtml(str) {
+            if(!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if(m === '&') return '&amp;';
+                if(m === '<') return '&lt;';
+                if(m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        // Initialisation
+        loadData();
+        initMusic();
+        
+        // Rafraîchissement automatique toutes les 10 secondes
+        setInterval(() => {
+            loadData();
+        }, 10000);
+    </script>
+</body>
+</html>
+
+la voix de la purge ....
