@@ -22,7 +22,6 @@ INFO PURGE 24
             min-height: 100vh;
         }
         
-        /* Effet de fond mystérieux mais clair */
         body::before {
             content: '';
             position: fixed;
@@ -40,7 +39,6 @@ INFO PURGE 24
             margin: 0 auto;
         }
         
-        /* Header avec effet live */
         header {
             text-align: center;
             padding: 40px 20px;
@@ -95,7 +93,6 @@ INFO PURGE 24
             padding: 10px 20px;
         }
         
-        /* Navigation */
         nav {
             display: flex;
             gap: 15px;
@@ -124,7 +121,6 @@ INFO PURGE 24
             box-shadow: 0 5px 20px rgba(255,68,68,0.3);
         }
         
-        /* Sections */
         .section {
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(10px);
@@ -153,7 +149,6 @@ INFO PURGE 24
             padding-left: 15px;
         }
         
-        /* Classement */
         .ranking-tabs {
             display: flex;
             gap: 10px;
@@ -226,7 +221,22 @@ INFO PURGE 24
             font-family: 'Orbitron', monospace;
         }
         
-        /* Formulaires */
+        .clan-like-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,68,68,0.3);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .clan-like-btn:hover {
+            background: #ff4444;
+            transform: scale(1.05);
+        }
+        
         form input, form textarea {
             width: 100%;
             padding: 14px;
@@ -261,7 +271,6 @@ INFO PURGE 24
             transform: scale(1.02);
         }
         
-        /* Messages */
         .message {
             background: rgba(255,68,68,0.05);
             border: 1px solid rgba(255,68,68,0.2);
@@ -286,7 +295,6 @@ INFO PURGE 24
             margin-top: 10px;
         }
         
-        /* Admin link */
         .admin-link {
             position: fixed;
             bottom: 20px;
@@ -307,7 +315,6 @@ INFO PURGE 24
             color: black;
         }
         
-        /* Musique */
         .music-control {
             position: fixed;
             bottom: 20px;
@@ -437,9 +444,33 @@ INFO PURGE 24
                         <span class="ranking-name">⚔️ ${escapeHtml(clan.name)}</span>
                         <span class="ranking-leader">👑 ${escapeHtml(clan.leader)}</span>
                         <span class="ranking-score">⭐ ${score} ${periodLabel}</span>
+                        <button class="clan-like-btn" onclick="likeClan(${clan.id})">❤️ ${clan.likes || 0} likes</button>
                     </div>
                 `;
             }).join('');
+        }
+        
+        // Fonction pour liker un clan
+        function likeClan(id) {
+            const clan = globalData.clans.find(c => c.id === id);
+            if (clan) {
+                clan.likes = (clan.likes || 0) + 1;
+                saveData();
+                updateRanking();
+                playSound('ding');
+                showTempMessage("❤️ Vous avez liké le clan " + clan.name + " !");
+            }
+        }
+        
+        function showTempMessage(msg) {
+            const container = document.getElementById('rankingList');
+            const tempDiv = document.createElement('div');
+            tempDiv.style.cssText = 'position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:#ff4444; padding:10px 20px; border-radius:30px; z-index:1000; animation:fadeOut 2s ease forwards;';
+            tempDiv.innerHTML = msg;
+            document.body.appendChild(tempDiv);
+            setTimeout(() => {
+                tempDiv.remove();
+            }, 2000);
         }
         
         function updateForum() {
@@ -553,6 +584,17 @@ INFO PURGE 24
         loadData();
         initMusic();
         setInterval(() => { loadData(); }, 10000);
+        
+        // Ajout du style pour l'animation fadeOut
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+                70% { opacity: 1; }
+                100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
