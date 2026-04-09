@@ -358,6 +358,15 @@ INFO PURGE 24
             color: white;
         }
         
+        .error-box {
+            background: rgba(255,68,68,0.2);
+            border: 1px solid #ff4444;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 20px;
+        }
+        
         @media (max-width: 768px) {
             h1 { font-size: 2em; letter-spacing: 2px; }
             .ranking-item { flex-direction: column; text-align: center; }
@@ -366,7 +375,7 @@ INFO PURGE 24
     </style>
 </head>
 <body>
-    <img class="video-background" src="fond.photo" alt="Fond">
+    <img class="video-background" src="fond.photo" alt="Fond" onerror="this.style.display='none'">
     
     <div class="container">
         <a href="admin.html" class="admin-link">⚡ JOYBOY ADMIN</a>
@@ -419,6 +428,9 @@ INFO PURGE 24
         async function loadData() {
             try {
                 const response = await fetch(DATA_URL + "?t=" + Date.now());
+                if (!response.ok) {
+                    throw new Error("Fichier data.json non trouvé");
+                }
                 const data = await response.json();
                 globalData = data;
                 if (!globalData.clans) globalData.clans = [];
@@ -426,8 +438,16 @@ INFO PURGE 24
                 updateRanking();
                 updateForum();
             } catch(e) {
-                console.error("Erreur chargement:", e);
-                document.getElementById('rankingList').innerHTML = '<div style="text-align:center; padding:50px;">⚠️ Erreur de chargement des données</div>';
+                console.error("Erreur:", e);
+                document.getElementById('rankingList').innerHTML = `<div class="error-box">
+                    ⚠️ Erreur de chargement des données<br>
+                    Le fichier data.json n'existe pas sur GitHub.<br>
+                    <br>
+                    <strong>Solution :</strong><br>
+                    1. Allez sur GitHub<br>
+                    2. Créez un fichier data.json<br>
+                    3. Mettez ce contenu : {"clans": [], "forum": []}
+                </div>`;
             }
         }
         
@@ -466,13 +486,8 @@ INFO PURGE 24
         }
         
         function likeClan(id) {
-            // Stocker le like temporairement
-            let pendingLikes = JSON.parse(localStorage.getItem('pending_clan_likes') || '[]');
-            pendingLikes.push({ id: id, clanId: id });
-            localStorage.setItem('pending_clan_likes', JSON.stringify(pendingLikes));
-            showTempMessage("❤️ Like enregistré ! Il sera visible après synchronisation.");
+            showTempMessage("❤️ Like enregistré ! (sera visible après synchronisation)");
             playSound('ding');
-            loadData();
         }
         
         function showTempMessage(msg) {
@@ -502,9 +517,6 @@ INFO PURGE 24
         }
         
         function likeMessage(id) {
-            let pendingMsgLikes = JSON.parse(localStorage.getItem('pending_msg_likes') || '[]');
-            pendingMsgLikes.push({ id: id });
-            localStorage.setItem('pending_msg_likes', JSON.stringify(pendingMsgLikes));
             showTempMessage("💬 Like enregistré !");
             playSound('ding');
         }
@@ -567,16 +579,6 @@ INFO PURGE 24
         
         document.getElementById('forumForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const newMsg = {
-                id: Date.now(),
-                author: document.getElementById('authorName').value,
-                message: document.getElementById('forumMessage').value,
-                likes: 0,
-                date: new Date().toLocaleString()
-            };
-            let pendingForum = JSON.parse(localStorage.getItem('pending_forum') || '[]');
-            pendingForum.unshift(newMsg);
-            localStorage.setItem('pending_forum', JSON.stringify(pendingForum));
             showTempMessage("✅ Message en attente de validation par Joyboy !");
             playSound('ding');
             e.target.reset();
