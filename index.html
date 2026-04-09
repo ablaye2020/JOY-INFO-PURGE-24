@@ -247,20 +247,28 @@ INFO PURGE 24
             min-width: 70px;
         }
         
+        .clan-icon {
+            font-size: 48px;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
+            transition: transform 0.3s;
+        }
+        
+        .ranking-item:hover .clan-icon {
+            transform: scale(1.1);
+        }
+        
         .ranking-name {
-            flex: 2;
-            font-size: 1.8em;
+            font-size: 1.4em;
             font-weight: 800;
             color: #1a1a2e;
             letter-spacing: 1px;
         }
         
         .ranking-leader {
-            flex: 1;
-            font-size: 1.4em;
-            font-weight: 600;
+            font-size: 0.9em;
+            font-weight: 500;
             color: #2c3e66;
-            font-style: italic;
+            margin-top: 4px;
         }
         
         .ranking-score {
@@ -270,9 +278,10 @@ INFO PURGE 24
             color: #1a1a2e;
             font-family: 'Orbitron', monospace;
             background: rgba(255,68,68,0.1);
-            padding: 5px 12px;
+            padding: 8px 15px;
             border-radius: 20px;
             text-align: center;
+            min-width: 150px;
         }
         
         .clan-like-btn {
@@ -422,8 +431,8 @@ INFO PURGE 24
             h1 { font-size: 2em; letter-spacing: 2px; }
             .ranking-item { flex-direction: column; text-align: center; }
             .ranking-number { font-size: 24px; }
-            .ranking-name { font-size: 1.4em; }
-            .ranking-leader { font-size: 1.2em; }
+            .clan-icon { font-size: 36px; }
+            .ranking-name { font-size: 1.2em; }
         }
     </style>
 </head>
@@ -476,8 +485,7 @@ INFO PURGE 24
     <script>
         function createFloatingDots() {
             const container = document.getElementById('floatingDots');
-            const numDots = 50;
-            for(let i = 0; i < numDots; i++) {
+            for(let i = 0; i < 50; i++) {
                 const dot = document.createElement('div');
                 dot.className = 'dot';
                 const size = Math.random() * 6 + 2;
@@ -491,9 +499,14 @@ INFO PURGE 24
                 dot.style.animationDuration = duration + 's';
                 dot.style.animationDelay = delay + 's';
                 dot.style.setProperty('--direction', direction);
-                dot.style.background = `radial-gradient(circle, #ff${Math.floor(Math.random() * 100 + 44)}44, #ff8888)`;
                 container.appendChild(dot);
             }
+        }
+        
+        // FONCTION POUR LES ICÔNES DES CLANS
+        function getClanIcon(index) {
+            const icons = ['⚔️', '🛡️', '👑', '🏰', '🐉', '⚡', '🔥', '❄️', '🌊', '🌪️', '💀', '🦅', '🐺', '🦁', '🐉', '🏹', '🗡️', '🔱', '⛓️', '🌙', '⭐', '🌀', '🎯', '💎'];
+            return icons[index % icons.length];
         }
         
         const DATA_URL = "https://raw.githubusercontent.com/ablaye2020/info-purge-24/main/data.json";
@@ -545,8 +558,13 @@ INFO PURGE 24
                 return `
                     <div class="ranking-item">
                         <span class="ranking-number">#${index+1}</span>
-                        <span class="ranking-name">⚔️ ${escapeHtml(clan.name)}</span>
-                        <span class="ranking-leader">👑 ${escapeHtml(clan.leader)}</span>
+                        <div style="display:flex; align-items:center; gap:15px; flex:2;">
+                            <div class="clan-icon">${getClanIcon(index)}</div>
+                            <div>
+                                <div class="ranking-name">⚔️ ${escapeHtml(clan.name)}</div>
+                                <div class="ranking-leader">👑 ${escapeHtml(clan.leader)}</div>
+                            </div>
+                        </div>
                         <span class="ranking-score">⭐ ${score} ${periodLabel}</span>
                         <button class="clan-like-btn" onclick="likeClan(${clan.id})">❤️ ${clan.likes || 0} likes</button>
                     </div>
@@ -561,7 +579,6 @@ INFO PURGE 24
                 const clan = data.clans.find(c => c.id === id);
                 if (clan) {
                     clan.likes = (clan.likes || 0) + 1;
-                    // Sauvegarder dans localStorage pour l'admin
                     localStorage.setItem('pending_clan_likes', JSON.stringify(data.clans));
                     showTempMessage("❤️ Like enregistré !");
                     playSound('ding');
@@ -636,7 +653,7 @@ INFO PURGE 24
         
         function initMusic() {
             try {
-            backgroundMusic = new Audio('musique.mp3');
+                backgroundMusic = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3');
                 backgroundMusic.loop = true;
                 backgroundMusic.volume = 0.15;
             } catch(e) {}
@@ -707,3 +724,5 @@ INFO PURGE 24
     </script>
 </body>
 </html>
+
+la voix de la purge .. info purge 24
