@@ -8,11 +8,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: 'Rajdhani', sans-serif;
@@ -22,10 +18,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             min-height: 100vh;
         }
         
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+        .container { max-width: 1200px; margin: 0 auto; }
         
         header {
             text-align: center;
@@ -37,11 +30,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             margin-bottom: 30px;
         }
         
-        h1 {
-            font-family: 'Orbitron', monospace;
-            color: #ff6666;
-            font-size: 2em;
-        }
+        h1 { font-family: 'Orbitron', monospace; color: #ff6666; font-size: 2em; }
         
         button {
             background: #ff4444;
@@ -55,9 +44,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             font-family: 'Orbitron', monospace;
         }
         
-        button:hover {
-            background: #cc0000;
-        }
+        button:hover { background: #cc0000; }
         
         .login-box {
             max-width: 400px;
@@ -113,14 +100,11 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             border-radius: 20px;
         }
         
-        .delete-btn {
-            background: #cc0000;
-        }
+        .delete-btn { background: #cc0000; }
+        .reset-btn { background: #f39c12; color: #1a1a2e; }
+        .reset-btn:hover { background: #e67e22; }
         
-        .error {
-            color: #ff8888;
-            margin-top: 10px;
-        }
+        .error { color: #ff8888; margin-top: 10px; }
         
         .add-clan-form {
             background: rgba(255,68,68,0.1);
@@ -130,10 +114,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             border: 1px solid rgba(255,68,68,0.3);
         }
         
-        .add-clan-form input, .add-clan-form textarea {
-            width: 100%;
-            margin: 10px 0;
-        }
+        .add-clan-form input, .add-clan-form textarea { width: 100%; margin: 10px 0; }
         
         h2 {
             color: #ff6666;
@@ -150,6 +131,18 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             border-radius: 12px;
             margin-bottom: 20px;
             text-align: center;
+        }
+        
+        .reset-section {
+            background: rgba(255,68,68,0.15);
+            border: 1px solid #ff4444;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
     </style>
 </head>
@@ -174,11 +167,15 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             </header>
 
             <div class="info-box">
-                <strong>📌 IMPORTANT :</strong><br>
-                1. Ajoutez des clans et des points ci-dessous<br>
-                2. Cliquez sur "EXPORTER" pour télécharger data.json<br>
-                3. Allez sur GitHub et remplacez l'ancien data.json<br>
-                4. Le public verra les changements immédiatement !
+                <strong>📌 RÉINITIALISATION DES SCORES :</strong><br>
+                Utilisez les boutons ci-dessous pour remettre à zéro les scores d'une période.
+            </div>
+
+            <!-- SECTION RÉINITIALISATION -->
+            <div class="reset-section">
+                <button onclick="resetWeekScores()" class="reset-btn" style="background:#e74c3c;">🔄 RÉINITIALISER SEMAINE</button>
+                <button onclick="resetMonthScores()" class="reset-btn" style="background:#e67e22;">🔄 RÉINITIALISER MOIS</button>
+                <button onclick="resetYearScores()" class="reset-btn" style="background:#f1c40f;">🔄 RÉINITIALISER ANNÉE</button>
             </div>
 
             <!-- Formulaire pour ajouter un nouveau clan -->
@@ -198,6 +195,10 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             <h2>⭐ AJOUTER DES POINTS</h2>
             <p style="margin-bottom:15px;">⚠️ Les points s'ajoutent automatiquement aux 3 classements (Semaine, Mois, Année)</p>
             <div id="scoreInputs"></div>
+
+            <!-- Données en attente -->
+            <h2>📋 DONNÉES EN ATTENTE</h2>
+            <div id="pendingContainer"></div>
         </div>
     </div>
 
@@ -206,6 +207,10 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
         const STORAGE_KEY = "infopurge24_data";
         
         let currentData = { clans: [], forum: [] };
+        let pendingClans = [];
+        let pendingForum = [];
+        let pendingClanLikes = [];
+        let pendingMsgLikes = [];
         
         function checkPin() {
             const enteredPin = document.getElementById('pinCode').value;
@@ -239,12 +244,49 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             }
             if(!currentData.clans) currentData.clans = [];
             if(!currentData.forum) currentData.forum = [];
+            
+            pendingClans = JSON.parse(localStorage.getItem('pending_clans') || '[]');
+            pendingForum = JSON.parse(localStorage.getItem('pending_forum') || '[]');
+            pendingClanLikes = JSON.parse(localStorage.getItem('pending_clan_likes') || '[]');
+            pendingMsgLikes = JSON.parse(localStorage.getItem('pending_msg_likes') || '[]');
+            
             displayAdmin();
         }
         
         function saveData() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData));
             displayAdmin();
+        }
+        
+        // RÉINITIALISATION DES SCORES
+        function resetWeekScores() {
+            if(confirm("⚠️ Réinitialiser TOUS les scores de la SEMAINE ? Les scores du mois et de l'année restent.")) {
+                currentData.clans.forEach(clan => {
+                    clan.score_week = 0;
+                });
+                saveData();
+                alert("✅ Scores de la SEMAINE réinitialisés !");
+            }
+        }
+        
+        function resetMonthScores() {
+            if(confirm("⚠️ Réinitialiser TOUS les scores du MOIS ? Les scores de la semaine et de l'année restent.")) {
+                currentData.clans.forEach(clan => {
+                    clan.score_month = 0;
+                });
+                saveData();
+                alert("✅ Scores du MOIS réinitialisés !");
+            }
+        }
+        
+        function resetYearScores() {
+            if(confirm("⚠️ Réinitialiser TOUS les scores de l'ANNÉE ? Les scores de la semaine et du mois restent.")) {
+                currentData.clans.forEach(clan => {
+                    clan.score_year = 0;
+                });
+                saveData();
+                alert("✅ Scores de l'ANNÉE réinitialisés !");
+            }
         }
         
         function addNewClan() {
@@ -280,6 +322,47 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
         }
         
         function displayAdmin() {
+            // Afficher les données en attente
+            const pendingContainer = document.getElementById('pendingContainer');
+            let pendingHtml = '';
+            
+            if(pendingClans.length > 0) {
+                pendingHtml += `<div class="clan-card" style="background:#f39c12; color:#1a1a2e;">
+                    <strong>📝 NOUVEAUX CLANS (${pendingClans.length}) :</strong><br>
+                    ${pendingClans.map(c => `🏰 ${c.name} (Chef: ${c.leader})`).join('<br>')}
+                    <button onclick="acceptPendingClans()" style="background:#27ae60; margin-top:10px;">✅ ACCEPTER</button>
+                    <button onclick="rejectPendingClans()" style="background:#cc0000;">❌ REFUSER</button>
+                </div>`;
+            }
+            
+            if(pendingForum.length > 0) {
+                pendingHtml += `<div class="clan-card" style="background:#3498db;">
+                    <strong>💬 NOUVEAUX MESSAGES (${pendingForum.length}) :</strong><br>
+                    ${pendingForum.map(m => `🔥 ${m.author}: "${m.message.substring(0,50)}..."`).join('<br>')}
+                    <button onclick="acceptPendingForum()" style="background:#27ae60; margin-top:10px;">✅ ACCEPTER</button>
+                    <button onclick="rejectPendingForum()" style="background:#cc0000;">❌ REFUSER</button>
+                </div>`;
+            }
+            
+            if(pendingClanLikes.length > 0) {
+                pendingHtml += `<div class="clan-card" style="background:#e74c3c;">
+                    <strong>❤️ LIKES CLANS (${pendingClanLikes.length}) :</strong><br>
+                    <button onclick="acceptPendingClanLikes()" style="background:#27ae60;">✅ APPLIQUER LIKES</button>
+                </div>`;
+            }
+            
+            if(pendingMsgLikes.length > 0) {
+                pendingHtml += `<div class="clan-card" style="background:#e74c3c;">
+                    <strong>❤️ LIKES MESSAGES (${pendingMsgLikes.length}) :</strong><br>
+                    <button onclick="acceptPendingMsgLikes()" style="background:#27ae60;">✅ APPLIQUER LIKES</button>
+                </div>`;
+            }
+            
+            if(pendingHtml === '') {
+                pendingHtml = '<div class="clan-card">✅ Aucune donnée en attente.</div>';
+            }
+            pendingContainer.innerHTML = pendingHtml;
+            
             // Liste des clans
             const clansContainer = document.getElementById('clansList');
             if(currentData.clans.length === 0) {
@@ -289,6 +372,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
                     <div class="clan-card">
                         <strong>⚔️ ${escapeHtml(clan.name)}</strong> - Chef: ${escapeHtml(clan.leader)}<br>
                         📝 ${escapeHtml(clan.description) || "Aucune description"}<br>
+                        📅 Créé le: ${new Date(clan.created_at).toLocaleDateString()}<br>
                         ❤️ ${clan.likes || 0} likes<br>
                         <button onclick="deleteClan(${clan.id})" class="delete-btn">🗑️ SUPPRIMER</button>
                     </div>
@@ -315,6 +399,58 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
                     </div>
                 `).join('');
             }
+        }
+        
+        function acceptPendingClans() {
+            currentData.clans = [...pendingClans, ...currentData.clans];
+            pendingClans = [];
+            localStorage.setItem('pending_clans', JSON.stringify(pendingClans));
+            saveData();
+            alert(`✅ Clans ajoutés !`);
+        }
+        
+        function rejectPendingClans() {
+            pendingClans = [];
+            localStorage.setItem('pending_clans', JSON.stringify(pendingClans));
+            displayAdmin();
+            alert(`❌ Clans refusés.`);
+        }
+        
+        function acceptPendingForum() {
+            currentData.forum = [...pendingForum, ...currentData.forum];
+            pendingForum = [];
+            localStorage.setItem('pending_forum', JSON.stringify(pendingForum));
+            saveData();
+            alert(`✅ Messages ajoutés !`);
+        }
+        
+        function rejectPendingForum() {
+            pendingForum = [];
+            localStorage.setItem('pending_forum', JSON.stringify(pendingForum));
+            displayAdmin();
+            alert(`❌ Messages refusés.`);
+        }
+        
+        function acceptPendingClanLikes() {
+            for(let like of pendingClanLikes) {
+                const clan = currentData.clans.find(c => c.id == like.id);
+                if(clan) clan.likes = (clan.likes || 0) + 1;
+            }
+            pendingClanLikes = [];
+            localStorage.setItem('pending_clan_likes', JSON.stringify(pendingClanLikes));
+            saveData();
+            alert(`✅ Likes appliqués !`);
+        }
+        
+        function acceptPendingMsgLikes() {
+            for(let like of pendingMsgLikes) {
+                const msg = currentData.forum.find(m => m.id == like.id);
+                if(msg) msg.likes = (msg.likes || 0) + 1;
+            }
+            pendingMsgLikes = [];
+            localStorage.setItem('pending_msg_likes', JSON.stringify(pendingMsgLikes));
+            saveData();
+            alert(`✅ Likes appliqués !`);
         }
         
         function deleteClan(id) {
@@ -359,7 +495,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             a.click();
             URL.revokeObjectURL(url);
             
-            alert(`✅ Fichier data.json téléchargé !\n\nÉTAPES SUIVANTES :\n1. Allez sur https://github.com/ablaye2020/info-purge-24\n2. Cliquez sur data.json\n3. Cliquez sur le crayon (modifier)\n4. Copiez-collez le contenu du fichier\n5. Cliquez sur "Commit changes"\n\n🔥 Le public verra les changements !`);
+            alert(`✅ Fichier data.json téléchargé !\n\nÉTAPES :\n1. Allez sur GitHub\n2. Cliquez sur data.json\n3. Cliquez sur le crayon (modifier)\n4. Copiez-collez le contenu\n5. Cliquez sur "Commit changes"\n\n🔥 Le public verra les changements !`);
         }
         
         function escapeHtml(str) {
