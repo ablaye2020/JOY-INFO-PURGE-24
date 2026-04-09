@@ -14,7 +14,6 @@ INFO PURGE 24
             box-sizing: border-box;
         }
         
-        /* ANIMATION DES POINTS VOLANTS */
         .floating-dots {
             position: fixed;
             top: 0;
@@ -53,7 +52,6 @@ INFO PURGE 24
             }
         }
         
-        /* IMAGE DE FOND */
         .video-background {
             position: fixed;
             top: 0;
@@ -430,7 +428,6 @@ INFO PURGE 24
     </style>
 </head>
 <body>
-    <!-- POINTS VOLANTS ANIMÉS -->
     <div class="floating-dots" id="floatingDots"></div>
     
     <img class="video-background" src="fond.photo" alt="Fond" onerror="this.style.display='none'">
@@ -477,11 +474,9 @@ INFO PURGE 24
     </div>
 
     <script>
-        // CRÉATION DES POINTS VOLANTS
         function createFloatingDots() {
             const container = document.getElementById('floatingDots');
             const numDots = 50;
-            
             for(let i = 0; i < numDots; i++) {
                 const dot = document.createElement('div');
                 dot.className = 'dot';
@@ -490,7 +485,6 @@ INFO PURGE 24
                 const delay = Math.random() * 10;
                 const startX = Math.random() * 100;
                 const direction = Math.random() > 0.5 ? 1 : -1;
-                
                 dot.style.width = size + 'px';
                 dot.style.height = size + 'px';
                 dot.style.left = startX + '%';
@@ -498,7 +492,6 @@ INFO PURGE 24
                 dot.style.animationDelay = delay + 's';
                 dot.style.setProperty('--direction', direction);
                 dot.style.background = `radial-gradient(circle, #ff${Math.floor(Math.random() * 100 + 44)}44, #ff8888)`;
-                
                 container.appendChild(dot);
             }
         }
@@ -512,9 +505,7 @@ INFO PURGE 24
         async function loadData() {
             try {
                 const response = await fetch(DATA_URL + "?t=" + Date.now());
-                if (!response.ok) {
-                    throw new Error("Fichier data.json non trouvé");
-                }
+                if (!response.ok) throw new Error("Fichier data.json non trouvé");
                 const data = await response.json();
                 globalData = data;
                 if (!globalData.clans) globalData.clans = [];
@@ -522,15 +513,9 @@ INFO PURGE 24
                 updateRanking();
                 updateForum();
             } catch(e) {
-                console.error("Erreur:", e);
                 document.getElementById('rankingList').innerHTML = `<div class="error-box">
                     ⚠️ Erreur de chargement des données<br>
-                    Le fichier data.json n'existe pas sur GitHub.<br>
-                    <br>
-                    <strong>Solution :</strong><br>
-                    1. Allez sur GitHub<br>
-                    2. Créez un fichier data.json<br>
-                    3. Mettez ce contenu : {"clans": [], "forum": []}
+                    Le fichier data.json n'existe pas sur GitHub.
                 </div>`;
             }
         }
@@ -569,9 +554,22 @@ INFO PURGE 24
             }).join('');
         }
         
-        function likeClan(id) {
-            showTempMessage("❤️ Like enregistré ! (sera visible après synchronisation)");
-            playSound('ding');
+        async function likeClan(id) {
+            try {
+                const response = await fetch(DATA_URL + "?t=" + Date.now());
+                const data = await response.json();
+                const clan = data.clans.find(c => c.id === id);
+                if (clan) {
+                    clan.likes = (clan.likes || 0) + 1;
+                    // Sauvegarder dans localStorage pour l'admin
+                    localStorage.setItem('pending_clan_likes', JSON.stringify(data.clans));
+                    showTempMessage("❤️ Like enregistré !");
+                    playSound('ding');
+                    loadData();
+                }
+            } catch(e) {
+                showTempMessage("❌ Erreur, réessayez");
+            }
         }
         
         function showTempMessage(msg) {
@@ -579,9 +577,7 @@ INFO PURGE 24
             tempDiv.style.cssText = 'position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:#ff4444; color:white; padding:10px 20px; border-radius:30px; z-index:1000; animation:fadeOut 2s ease forwards; font-family:Orbitron;';
             tempDiv.innerHTML = msg;
             document.body.appendChild(tempDiv);
-            setTimeout(() => {
-                tempDiv.remove();
-            }, 2000);
+            setTimeout(() => { tempDiv.remove(); }, 2000);
         }
         
         function updateForum() {
@@ -600,9 +596,21 @@ INFO PURGE 24
             `).join('');
         }
         
-        function likeMessage(id) {
-            showTempMessage("💬 Like enregistré !");
-            playSound('ding');
+        async function likeMessage(id) {
+            try {
+                const response = await fetch(DATA_URL + "?t=" + Date.now());
+                const data = await response.json();
+                const msg = data.forum.find(m => m.id === id);
+                if (msg) {
+                    msg.likes = (msg.likes || 0) + 1;
+                    localStorage.setItem('pending_msg_likes', JSON.stringify(data.forum));
+                    showTempMessage("💬 Like enregistré !");
+                    playSound('ding');
+                    loadData();
+                }
+            } catch(e) {
+                showTempMessage("❌ Erreur");
+            }
         }
         
         function playSound(type) {
@@ -663,7 +671,17 @@ INFO PURGE 24
         
         document.getElementById('forumForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            showTempMessage("✅ Message en attente de validation par Joyboy !");
+            const newMsg = {
+                id: Date.now(),
+                author: document.getElementById('authorName').value,
+                message: document.getElementById('forumMessage').value,
+                likes: 0,
+                date: new Date().toLocaleString()
+            };
+            let pendingForum = JSON.parse(localStorage.getItem('pending_forum') || '[]');
+            pendingForum.unshift(newMsg);
+            localStorage.setItem('pending_forum', JSON.stringify(pendingForum));
+            showTempMessage("✅ Message en attente de validation !");
             playSound('ding');
             e.target.reset();
         });
@@ -678,22 +696,14 @@ INFO PURGE 24
             });
         }
         
-        // Initialisation
         createFloatingDots();
         loadData();
         initMusic();
         setInterval(() => { loadData(); }, 15000);
         
         const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeOut {
-                0% { opacity: 1; transform: translateX(-50%) translateY(0); }
-                70% { opacity: 1; }
-                100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-            }
-        `;
+        style.textContent = `@keyframes fadeOut { 0% { opacity: 1; transform: translateX(-50%) translateY(0); } 70% { opacity: 1; } 100% { opacity: 0; transform: translateX(-50%) translateY(-20px); } }`;
         document.head.appendChild(style);
     </script>
 </body>
 </html>
-family of the purge by joyboy 
