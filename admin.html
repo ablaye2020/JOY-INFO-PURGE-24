@@ -142,6 +142,14 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             border-left: 3px solid #ff4444;
             padding-left: 15px;
         }
+        
+        .pending-data {
+            background: rgba(255,68,68,0.2);
+            border: 1px solid #ff4444;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -161,7 +169,11 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
                 <p>Bienvenue Joyboy</p>
                 <button onclick="logout()">🚪 Déconnexion</button>
                 <a href="index.html"><button>🏠 Voir le site</button></a>
+                <button onclick="syncToGitHub()" style="background:#27ae60;">🚀 PUBLIER SUR GITHUB</button>
             </header>
+
+            <!-- Données en attente -->
+            <div id="pendingContainer"></div>
 
             <!-- Formulaire pour ajouter un nouveau clan -->
             <div class="add-clan-form">
@@ -180,14 +192,23 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             <h2>⭐ AJOUTER DES POINTS</h2>
             <p style="margin-bottom:15px;">⚠️ Les points s'ajoutent automatiquement aux 3 classements (Semaine, Mois, Année)</p>
             <div id="scoreInputs"></div>
+
+            <!-- Forum en attente -->
+            <h2>💬 MESSAGES DU FORUM EN ATTENTE</h2>
+            <div id="pendingForumContainer"></div>
         </div>
     </div>
 
     <script>
         const ADMIN_PIN = "2007";
-        const STORAGE_KEY = "infopurge24_data";
+        const DATA_URL = "https://raw.githubusercontent.com/ablaye2020/info-purge-24/main/data.json";
+        const REPO_API = "https://api.github.com/repos/ablaye2020/info-purge-24/contents/data.json";
         
         let currentData = { clans: [], forum: [] };
+        let pendingClans = [];
+        let pendingForum = [];
+        let pendingClanLikes = [];
+        let pendingMsgLikes = [];
         
         function checkPin() {
             const enteredPin = document.getElementById('pinCode').value;
@@ -195,7 +216,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
                 localStorage.setItem('adminLoggedIn', 'true');
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'block';
-                loadData();
+                loadAllData();
             } else {
                 document.getElementById('loginError').innerText = '❌ Code incorrect';
                 document.getElementById('pinCode').value = '';
@@ -205,7 +226,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
         if(localStorage.getItem('adminLoggedIn') === 'true') {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
-            loadData();
+            loadAllData();
         }
         
         function logout() {
@@ -214,19 +235,113 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             document.getElementById('adminPanel').style.display = 'none';
         }
         
-        function loadData() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if(saved) {
-                currentData = JSON.parse(saved);
+        async function loadAllData() {
+            // Charger les données depuis GitHub
+            try {
+                const response = await fetch(DATA_URL + "?t=" + Date.now());
+                currentData = await response.json();
+                if(!currentData.clans) currentData.clans = [];
+                if(!currentData.forum) currentData.forum = [];
+            } catch(e) {
+                currentData = { clans: [], forum: [] };
             }
-            if(!currentData.clans) currentData.clans = [];
-            if(!currentData.forum) currentData.forum = [];
+            
+            // Charger les données en attente
+            pendingClans = JSON.parse(localStorage.getItem('pending_clans') || '[]');
+            pendingForum = JSON.parse(localStorage.getItem('pending_forum') || '[]');
+            pendingClanLikes = JSON.parse(localStorage.getItem('pending_clan_likes') || '[]');
+            pendingMsgLikes = JSON.parse(localStorage.getItem('pending_msg_likes') || '[]');
+            
             displayAdmin();
         }
         
-        function saveData() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData));
-            displayAdmin();
+        function displayAdmin() {
+            // Afficher les données en attente
+            const pendingContainer = document.getElementById('pendingContainer');
+            let pendingHtml = '';
+            
+            if(pendingClans.length > 0) {
+                pendingHtml += `<div class="pending-data">
+                    <strong>📝 NOUVEAUX CLANS EN ATTENTE (${pendingClans.length}) :</strong><br>
+                    ${pendingClans.map(c => `🏰 ${c.name} (Chef: ${c.leader})`).join('<br>')}
+                    <button onclick="acceptPendingClans()" style="background:#27ae60; margin-top:10px;">✅ AJOUTER CES CLANS</button>
+                    <button onclick="rejectPendingClans()" style="background:#cc0000;">❌ REFUSER</button>
+                </div>`;
+            }
+            
+            if(pendingClanLikes.length > 0) {
+                pendingHtml += `<div class="pending-data">
+                    <strong>❤️ LIKES SUR LES CLANS EN ATTENTE (${pendingClanLikes.length}) :</strong><br>
+                    ${pendingClanLikes.length} likes à appliquer
+                    <button onclick="acceptPendingClanLikes()" style="background:#27ae60; margin-top:10px;">✅ APPLIQUER CES LIKES</button>
+                </div>`;
+            }
+            
+            if(pendingHtml === '') {
+                pendingHtml = '<div class="pending-data">✅ Aucune donnée en attente.</div>';
+            }
+            pendingContainer.innerHTML = pendingHtml;
+            
+            // Forum en attente
+            const pendingForumContainer = document.getElementById('pendingForumContainer');
+            let forumHtml = '';
+            
+            if(pendingForum.length > 0) {
+                forumHtml += `<div class="pending-data">
+                    <strong>💬 NOUVEAUX MESSAGES FORUM (${pendingForum.length}) :</strong><br>
+                    ${pendingForum.map(m => `🔥 ${m.author}: "${m.message.substring(0,50)}..."`).join('<br>')}
+                    <button onclick="acceptPendingForum()" style="background:#27ae60; margin-top:10px;">✅ AJOUTER CES MESSAGES</button>
+                    <button onclick="rejectPendingForum()" style="background:#cc0000;">❌ REFUSER</button>
+                </div>`;
+            }
+            
+            if(pendingMsgLikes.length > 0) {
+                forumHtml += `<div class="pending-data">
+                    <strong>❤️ LIKES SUR LES MESSAGES EN ATTENTE (${pendingMsgLikes.length}) :</strong><br>
+                    <button onclick="acceptPendingMsgLikes()" style="background:#27ae60; margin-top:10px;">✅ APPLIQUER CES LIKES</button>
+                </div>`;
+            }
+            
+            if(forumHtml === '') {
+                forumHtml = '<div class="pending-data">✅ Aucun message en attente.</div>';
+            }
+            pendingForumContainer.innerHTML = forumHtml;
+            
+            // Liste des clans
+            const clansContainer = document.getElementById('clansList');
+            if(currentData.clans.length === 0) {
+                clansContainer.innerHTML = '<p>Aucun clan. Utilisez le formulaire ci-dessus pour en ajouter.</p>';
+            } else {
+                clansContainer.innerHTML = currentData.clans.map(clan => `
+                    <div class="clan-card">
+                        <strong>⚔️ ${escapeHtml(clan.name)}</strong> - Chef: ${escapeHtml(clan.leader)}<br>
+                        📝 ${escapeHtml(clan.description) || "Aucune description"}<br>
+                        ❤️ ${clan.likes || 0} likes<br>
+                        <button onclick="deleteClan(${clan.id})" class="delete-btn">🗑️ SUPPRIMER</button>
+                    </div>
+                `).join('');
+            }
+            
+            // Ajout de points
+            const scoreContainer = document.getElementById('scoreInputs');
+            if(currentData.clans.length === 0) {
+                scoreContainer.innerHTML = '<p>Créez d\'abord des clans.</p>';
+            } else {
+                scoreContainer.innerHTML = currentData.clans.map(clan => `
+                    <div class="clan-card">
+                        <strong>⚔️ ${escapeHtml(clan.name)}</strong>
+                        <div class="current-scores">
+                            <span>📅 SEMAINE: ${clan.score_week || 0} pts</span>
+                            <span>📆 MOIS: ${clan.score_month || 0} pts</span>
+                            <span>🗓️ ANNÉE: ${clan.score_year || 0} pts</span>
+                        </div>
+                        <div style="margin-top:15px;">
+                            <input type="number" id="points_${clan.id}" placeholder="Points" style="width:150px;">
+                            <button onclick="addPoints(${clan.id})">➕ AJOUTER</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
         }
         
         function addNewClan() {
@@ -235,7 +350,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             const description = document.getElementById('newClanDesc').value;
             
             if(!name || !leader) {
-                alert('❌ Veuillez entrer au moins le nom du clan et le chef');
+                alert('❌ Veuillez entrer le nom du clan et le chef');
                 return;
             }
             
@@ -252,59 +367,76 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             };
             
             currentData.clans.push(newClan);
-            saveData();
             
             document.getElementById('newClanName').value = '';
             document.getElementById('newClanLeader').value = '';
             document.getElementById('newClanDesc').value = '';
             
-            alert(`✅ Clan "${name}" ajouté avec succès !`);
+            displayAdmin();
+            alert(`✅ Clan "${name}" ajouté ! N'oubliez pas de cliquer sur "PUBLIER SUR GITHUB".`);
         }
         
-        function displayAdmin() {
-            // Liste des clans avec bouton supprimer
-            const clansContainer = document.getElementById('clansList');
-            if(currentData.clans.length === 0) {
-                clansContainer.innerHTML = '<p>Aucun clan enregistré. Utilisez le formulaire ci-dessus pour en ajouter.</p>';
-            } else {
-                clansContainer.innerHTML = currentData.clans.map(clan => `
-                    <div class="clan-card">
-                        <strong>⚔️ ${escapeHtml(clan.name)}</strong> - Chef: ${escapeHtml(clan.leader)}<br>
-                        📝 ${escapeHtml(clan.description) || "Aucune description"}<br>
-                        📅 Créé le: ${new Date(clan.created_at).toLocaleDateString()}<br>
-                        ❤️ ${clan.likes || 0} likes<br>
-                        <button onclick="deleteClan(${clan.id})" class="delete-btn">🗑️ SUPPRIMER CE CLAN</button>
-                    </div>
-                `).join('');
+        function acceptPendingClans() {
+            currentData.clans = [...pendingClans, ...currentData.clans];
+            pendingClans = [];
+            localStorage.setItem('pending_clans', JSON.stringify(pendingClans));
+            displayAdmin();
+            alert(`✅ Clans ajoutés !`);
+        }
+        
+        function rejectPendingClans() {
+            pendingClans = [];
+            localStorage.setItem('pending_clans', JSON.stringify(pendingClans));
+            displayAdmin();
+            alert(`❌ Clans refusés.`);
+        }
+        
+        function acceptPendingClanLikes() {
+            for(let like of pendingClanLikes) {
+                const clan = currentData.clans.find(c => c.id == like.clanId);
+                if(clan) {
+                    clan.likes = (clan.likes || 0) + 1;
+                }
             }
-            
-            // Ajout de points
-            const scoreContainer = document.getElementById('scoreInputs');
-            if(currentData.clans.length === 0) {
-                scoreContainer.innerHTML = '<p>Créez d\'abord des clans avec le formulaire ci-dessus.</p>';
-            } else {
-                scoreContainer.innerHTML = currentData.clans.map(clan => `
-                    <div class="clan-card">
-                        <strong>⚔️ ${escapeHtml(clan.name)}</strong>
-                        <div class="current-scores">
-                            <span>📅 SEMAINE: ${clan.score_week || 0} pts</span>
-                            <span>📆 MOIS: ${clan.score_month || 0} pts</span>
-                            <span>🗓️ ANNÉE: ${clan.score_year || 0} pts</span>
-                        </div>
-                        <div style="margin-top:15px;">
-                            <input type="number" id="points_${clan.id}" placeholder="Points à ajouter" style="width:150px;">
-                            <button onclick="addPoints(${clan.id})">➕ AJOUTER AUX 3 CLASSEMENTS</button>
-                        </div>
-                    </div>
-                `).join('');
+            pendingClanLikes = [];
+            localStorage.setItem('pending_clan_likes', JSON.stringify(pendingClanLikes));
+            displayAdmin();
+            alert(`✅ Likes appliqués !`);
+        }
+        
+        function acceptPendingForum() {
+            currentData.forum = [...pendingForum, ...currentData.forum];
+            pendingForum = [];
+            localStorage.setItem('pending_forum', JSON.stringify(pendingForum));
+            displayAdmin();
+            alert(`✅ Messages ajoutés !`);
+        }
+        
+        function rejectPendingForum() {
+            pendingForum = [];
+            localStorage.setItem('pending_forum', JSON.stringify(pendingForum));
+            displayAdmin();
+            alert(`❌ Messages refusés.`);
+        }
+        
+        function acceptPendingMsgLikes() {
+            for(let like of pendingMsgLikes) {
+                const msg = currentData.forum.find(m => m.id == like.id);
+                if(msg) {
+                    msg.likes = (msg.likes || 0) + 1;
+                }
             }
+            pendingMsgLikes = [];
+            localStorage.setItem('pending_msg_likes', JSON.stringify(pendingMsgLikes));
+            displayAdmin();
+            alert(`✅ Likes appliqués !`);
         }
         
         function deleteClan(id) {
             const clan = currentData.clans.find(c => c.id === id);
-            if(confirm(`Supprimer "${clan.name}" du classement ?`)) {
+            if(confirm(`Supprimer "${clan.name}" ?`)) {
                 currentData.clans = currentData.clans.filter(c => c.id !== id);
-                saveData();
+                displayAdmin();
                 alert(`✅ "${clan.name}" supprimé.`);
             }
         }
@@ -318,13 +450,31 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
                     clan.score_week = (clan.score_week || 0) + points;
                     clan.score_month = (clan.score_month || 0) + points;
                     clan.score_year = (clan.score_year || 0) + points;
-                    saveData();
-                    alert(`✅ ${points} points ajoutés à ${clan.name} dans les 3 classements !`);
+                    displayAdmin();
+                    alert(`✅ ${points} points ajoutés à ${clan.name} !`);
                 }
                 input.value = '';
             } else {
-                alert('❌ Entrez un nombre valide (supérieur à 0)');
+                alert('❌ Entrez un nombre valide');
             }
+        }
+        
+        async function syncToGitHub() {
+            const fullData = {
+                clans: currentData.clans,
+                forum: currentData.forum
+            };
+            
+            const dataStr = JSON.stringify(fullData, null, 2);
+            const blob = new Blob([dataStr], {type: "application/json"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'data.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert(`📦 Fichier data.json téléchargé !\n\nÉTAPES :\n1. Allez sur GitHub\n2. Ouvrez data.json\n3. Cliquez sur le crayon (modifier)\n4. Copiez-collez le contenu du fichier\n5. Cliquez sur "Commit changes"\n\n✅ Le public verra les changements immédiatement !`);
         }
         
         function escapeHtml(str) {
