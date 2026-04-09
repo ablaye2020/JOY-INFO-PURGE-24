@@ -16,7 +16,11 @@ INFO PURGE 24
         
         body {
             font-family: 'Rajdhani', sans-serif;
-            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 50%, #f0f0f0 100%);
+            /* IMAGE DE LUFFY EN FOND */
+            background: linear-gradient(rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.88)), url('https://wallpapercave.com/wp/wp12806882.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             color: #1a1a2e;
             padding: 20px;
             min-height: 100vh;
@@ -371,7 +375,6 @@ INFO PURGE 24
             </nav>
         </header>
 
-        <!-- Section Classement -->
         <div id="ranking" class="section active">
             <h2>🏆 CLASSEMENT DES CLANS</h2>
             <button class="refresh-btn" onclick="loadData()">🔄 RAFRAÎCHIR</button>
@@ -385,7 +388,6 @@ INFO PURGE 24
             </div>
         </div>
 
-        <!-- Section Forum -->
         <div id="forum" class="section">
             <h2>💬 FORUM PURGE 24</h2>
             <button class="refresh-btn" onclick="loadData()">🔄 RAFRAÎCHIR</button>
@@ -424,7 +426,6 @@ INFO PURGE 24
         
         function saveData() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(globalData));
-            // Mettre à jour l'affichage après sauvegarde
             updateRanking();
             updateForum();
         }
@@ -463,17 +464,12 @@ INFO PURGE 24
             }).join('');
         }
         
-        // Fonction pour liker un clan - les likes s'accumulent
         function likeClan(id) {
             const clan = globalData.clans.find(c => c.id === id);
             if (clan) {
-                // Incrémentation du like
                 clan.likes = (clan.likes || 0) + 1;
-                // Sauvegarder immédiatement
                 saveData();
-                // Jouer le son
                 playSound('ding');
-                // Afficher un message temporaire
                 showTempMessage("❤️ +1 like pour " + clan.name + " ! Total: " + clan.likes + " likes");
             }
         }
@@ -504,15 +500,11 @@ INFO PURGE 24
             `).join('');
         }
         
-        // Fonction pour liker un message - les likes s'accumulent
         function likeMessage(id) {
             const msg = globalData.forum.find(m => m.id == id);
             if (msg) {
-                // Incrémentation du like
                 msg.likes = (msg.likes || 0) + 1;
-                // Sauvegarder immédiatement
                 saveData();
-                // Jouer le son
                 playSound('ding');
             }
         }
@@ -615,4 +607,4 @@ INFO PURGE 24
     </script>
 </body>
 </html>
-by joyboy
+Joyboy 
