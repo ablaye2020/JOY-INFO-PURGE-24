@@ -14,6 +14,46 @@ INFO PURGE 24
             box-sizing: border-box;
         }
         
+        /* ANIMATION DES POINTS VOLANTS */
+        .floating-dots {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+            overflow: hidden;
+        }
+        
+        .dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: radial-gradient(circle, #ff4444, #ff8888);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: floatDot linear infinite;
+        }
+        
+        @keyframes floatDot {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-20vh) translateX(calc(100px * var(--direction))) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* IMAGE DE FOND */
         .video-background {
             position: fixed;
             top: 0;
@@ -22,12 +62,12 @@ INFO PURGE 24
             height: 100%;
             z-index: -2;
             object-fit: cover;
-            opacity: 0.3;
+            opacity: 0.2;
         }
         
         body {
             font-family: 'Rajdhani', sans-serif;
-            background: rgba(255, 255, 255, 0.85);
+            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
             color: #1a1a2e;
             padding: 20px;
             min-height: 100vh;
@@ -45,7 +85,7 @@ INFO PURGE 24
             text-align: center;
             padding: 40px 20px;
             margin-bottom: 30px;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             border: 1px solid rgba(255, 68, 68, 0.3);
@@ -104,15 +144,16 @@ INFO PURGE 24
         }
         
         nav button {
-            background: rgba(0,0,0,0.8);
-            border: 1px solid #ff4444;
+            background: linear-gradient(135deg, #1a1a2e, #2d2d44);
+            border: none;
             padding: 12px 28px;
             font-family: 'Orbitron', monospace;
             font-weight: bold;
-            color: white;
+            color: #ffffff;
             cursor: pointer;
             transition: all 0.3s;
             border-radius: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
         
         nav button:hover {
@@ -182,16 +223,16 @@ INFO PURGE 24
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 18px;
+            padding: 20px 18px;
             background: linear-gradient(90deg, rgba(255,68,68,0.05) 0%, rgba(255,68,68,0) 100%);
-            margin: 10px 0;
+            margin: 12px 0;
             border-radius: 12px;
-            border-left: 3px solid #ff4444;
+            border-left: 4px solid #ff4444;
             flex-wrap: wrap;
             gap: 15px;
             transition: all 0.3s;
             background-color: #ffffff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         
         .ranking-item:hover {
@@ -202,22 +243,26 @@ INFO PURGE 24
         
         .ranking-number {
             font-family: 'Orbitron', monospace;
-            font-size: 28px;
+            font-size: 32px;
             font-weight: bold;
             color: #ff4444;
-            min-width: 60px;
+            min-width: 70px;
         }
         
         .ranking-name {
             flex: 2;
-            font-size: 1.2em;
-            font-weight: bold;
+            font-size: 1.8em;
+            font-weight: 800;
             color: #1a1a2e;
+            letter-spacing: 1px;
         }
         
         .ranking-leader {
             flex: 1;
-            color: #666;
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #2c3e66;
+            font-style: italic;
         }
         
         .ranking-score {
@@ -226,18 +271,23 @@ INFO PURGE 24
             font-weight: bold;
             color: #1a1a2e;
             font-family: 'Orbitron', monospace;
+            background: rgba(255,68,68,0.1);
+            padding: 5px 12px;
+            border-radius: 20px;
+            text-align: center;
         }
         
         .clan-like-btn {
             background: rgba(255,68,68,0.1);
             border: 1px solid rgba(255,68,68,0.3);
-            padding: 8px 15px;
-            border-radius: 25px;
+            padding: 8px 18px;
+            border-radius: 30px;
             font-size: 14px;
             cursor: pointer;
             transition: all 0.3s;
             font-family: 'Orbitron', monospace;
             color: #1a1a2e;
+            font-weight: bold;
         }
         
         .clan-like-btn:hover {
@@ -292,6 +342,7 @@ INFO PURGE 24
         
         .message strong {
             color: #ff4444;
+            font-size: 1.1em;
         }
         
         .like-btn {
@@ -316,10 +367,11 @@ INFO PURGE 24
             padding: 8px 16px;
             border-radius: 25px;
             font-size: 12px;
-            color: #ff6666;
+            color: #ff8888;
             text-decoration: none;
             z-index: 100;
             backdrop-filter: blur(5px);
+            font-family: 'Orbitron', monospace;
         }
         
         .admin-link:hover {
@@ -359,22 +411,28 @@ INFO PURGE 24
         }
         
         .error-box {
-            background: rgba(255,68,68,0.2);
+            background: rgba(255,68,68,0.1);
             border: 1px solid #ff4444;
             padding: 20px;
             border-radius: 12px;
             text-align: center;
             margin: 20px;
+            color: #1a1a2e;
         }
         
         @media (max-width: 768px) {
             h1 { font-size: 2em; letter-spacing: 2px; }
             .ranking-item { flex-direction: column; text-align: center; }
-            .ranking-number { font-size: 20px; }
+            .ranking-number { font-size: 24px; }
+            .ranking-name { font-size: 1.4em; }
+            .ranking-leader { font-size: 1.2em; }
         }
     </style>
 </head>
 <body>
+    <!-- POINTS VOLANTS ANIMÉS -->
+    <div class="floating-dots" id="floatingDots"></div>
+    
     <img class="video-background" src="fond.photo" alt="Fond" onerror="this.style.display='none'">
     
     <div class="container">
@@ -419,6 +477,32 @@ INFO PURGE 24
     </div>
 
     <script>
+        // CRÉATION DES POINTS VOLANTS
+        function createFloatingDots() {
+            const container = document.getElementById('floatingDots');
+            const numDots = 50;
+            
+            for(let i = 0; i < numDots; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                const size = Math.random() * 6 + 2;
+                const duration = Math.random() * 8 + 4;
+                const delay = Math.random() * 10;
+                const startX = Math.random() * 100;
+                const direction = Math.random() > 0.5 ? 1 : -1;
+                
+                dot.style.width = size + 'px';
+                dot.style.height = size + 'px';
+                dot.style.left = startX + '%';
+                dot.style.animationDuration = duration + 's';
+                dot.style.animationDelay = delay + 's';
+                dot.style.setProperty('--direction', direction);
+                dot.style.background = `radial-gradient(circle, #ff${Math.floor(Math.random() * 100 + 44)}44, #ff8888)`;
+                
+                container.appendChild(dot);
+            }
+        }
+        
         const DATA_URL = "https://raw.githubusercontent.com/ablaye2020/info-purge-24/main/data.json";
         let currentRankingPeriod = 'week';
         let backgroundMusic = null;
@@ -594,6 +678,8 @@ INFO PURGE 24
             });
         }
         
+        // Initialisation
+        createFloatingDots();
         loadData();
         initMusic();
         setInterval(() => { loadData(); }, 15000);
@@ -610,3 +696,4 @@ INFO PURGE 24
     </script>
 </body>
 </html>
+family of the purge by joyboy 
