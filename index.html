@@ -14,21 +14,32 @@ INFO PURGE 24
             box-sizing: border-box;
         }
         
+        /* VIDEO DE FOND */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            object-fit: cover;
+            opacity: 0.4;
+        }
+        
         body {
             font-family: 'Rajdhani', sans-serif;
-            /* IMAGE DE LUFFY EN FOND */
-            background: linear-gradient(rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.88)), url('https://wallpapercave.com/wp/wp12806882.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            background: rgba(255, 255, 255, 0.85);
             color: #1a1a2e;
             padding: 20px;
             min-height: 100vh;
+            position: relative;
         }
         
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
         
         header {
@@ -361,6 +372,11 @@ INFO PURGE 24
     </style>
 </head>
 <body>
+    <!-- VIDEO DE FOND - Remplacez "votre_video.mp4" par le nom de votre vidéo -->
+    <video class="video-background" autoplay loop muted playsinline>
+        <source src="votre_video.mp4" type="video/mp4">
+    </video>
+    
     <div class="container">
         <a href="admin.html" class="admin-link">⚡ JOYBOY ADMIN</a>
         <div class="music-control" onclick="toggleMusic()" id="musicBtn">🎵</div>
@@ -607,4 +623,4 @@ INFO PURGE 24
     </script>
 </body>
 </html>
-Joyboy 
+joyboy
