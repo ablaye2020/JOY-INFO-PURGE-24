@@ -14,6 +14,44 @@ INFO PURGE 24
             box-sizing: border-box;
         }
         
+        /* BANDEAU DÉFILANT */
+        .marquee {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(90deg, #ff4444, #1a1a2e, #ff4444);
+            color: white;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5em;
+            font-weight: bold;
+            padding: 12px 0;
+            overflow: hidden;
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border-bottom: 2px solid #ff4444;
+        }
+        
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+            letter-spacing: 3px;
+        }
+        
+        .marquee-content span {
+            margin: 0 40px;
+        }
+        
+        @keyframes marquee {
+            0% {
+                transform: translateX(0%);
+            }
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+        
         .floating-dots {
             position: fixed;
             top: 0;
@@ -68,6 +106,7 @@ INFO PURGE 24
             background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
             color: #1a1a2e;
             padding: 20px;
+            padding-top: 90px;
             min-height: 100vh;
             position: relative;
         }
@@ -433,10 +472,25 @@ INFO PURGE 24
             .ranking-number { font-size: 24px; }
             .clan-icon { font-size: 36px; }
             .ranking-name { font-size: 1.2em; }
+            .marquee { font-size: 0.9em; padding: 8px 0; }
+            body { padding-top: 70px; }
         }
     </style>
 </head>
 <body>
+    <!-- BANDEAU DÉFILANT -->
+    <div class="marquee">
+        <div class="marquee-content">
+            <span>⚡ INFO PURGE 24 ⚡</span>
+            <span>🏆 LE RESPECT NE SE DEMANDE PAS, IL S'IMPOSE 🏆</span>
+            <span>⚡ INFO PURGE 24 ⚡</span>
+            <span>👑 JOYBOY 👑</span>
+            <span>⚡ INFO PURGE 24 ⚡</span>
+            <span>🔥 PURGE TOUS LES JOURS 🔥</span>
+            <span>⚡ INFO PURGE 24 ⚡</span>
+        </div>
+    </div>
+    
     <div class="floating-dots" id="floatingDots"></div>
     
     <img class="video-background" src="fond.photo" alt="Fond" onerror="this.style.display='none'">
@@ -503,7 +557,6 @@ INFO PURGE 24
             }
         }
         
-        // FONCTION POUR LES ICÔNES DES CLANS
         function getClanIcon(index) {
             const icons = ['⚔️', '🛡️', '👑', '🏰', '🐉', '⚡', '🔥', '❄️', '🌊', '🌪️', '💀', '🦅', '🐺', '🦁', '🐉', '🏹', '🗡️', '🔱', '⛓️', '🌙', '⭐', '🌀', '🎯', '💎'];
             return icons[index % icons.length];
@@ -724,5 +777,4 @@ INFO PURGE 24
     </script>
 </body>
 </html>
-
-la voix de la purge .. info purge 24
+la voix de la purge ..
