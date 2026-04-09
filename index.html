@@ -14,7 +14,6 @@ INFO PURGE 24
             box-sizing: border-box;
         }
         
-        /* IMAGE DE FOND (remplacez "fond.photo" par le nom de votre fichier) */
         .video-background {
             position: fixed;
             top: 0;
@@ -308,11 +307,6 @@ INFO PURGE 24
             color: white;
         }
         
-        .success {
-            color: #27ae60;
-            margin-top: 10px;
-        }
-        
         .admin-link {
             position: fixed;
             bottom: 20px;
@@ -372,7 +366,6 @@ INFO PURGE 24
     </style>
 </head>
 <body>
-    <!-- IMAGE DE FOND - REMPLACEZ "fond.photo" PAR LE NOM DE VOTRE FICHIER -->
     <img class="video-background" src="fond.photo" alt="Fond">
     
     <div class="container">
@@ -417,31 +410,25 @@ INFO PURGE 24
     </div>
 
     <script>
-        const STORAGE_KEY = "infopurge24_data";
+        const DATA_URL = "https://raw.githubusercontent.com/ablaye2020/info-purge-24/main/data.json";
         let currentRankingPeriod = 'week';
         let backgroundMusic = null;
         let musicPlaying = false;
-        let globalData = {
-            clans: [],
-            forum: []
-        };
+        let globalData = { clans: [], forum: [] };
         
-        function loadData() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                globalData = JSON.parse(saved);
+        async function loadData() {
+            try {
+                const response = await fetch(DATA_URL + "?t=" + Date.now());
+                const data = await response.json();
+                globalData = data;
+                if (!globalData.clans) globalData.clans = [];
+                if (!globalData.forum) globalData.forum = [];
+                updateRanking();
+                updateForum();
+            } catch(e) {
+                console.error("Erreur chargement:", e);
+                document.getElementById('rankingList').innerHTML = '<div style="text-align:center; padding:50px;">⚠️ Erreur de chargement des données</div>';
             }
-            if (!globalData.clans) globalData.clans = [];
-            if (!globalData.forum) globalData.forum = [];
-            
-            updateRanking();
-            updateForum();
-        }
-        
-        function saveData() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(globalData));
-            updateRanking();
-            updateForum();
         }
         
         function updateRanking() {
@@ -479,13 +466,13 @@ INFO PURGE 24
         }
         
         function likeClan(id) {
-            const clan = globalData.clans.find(c => c.id === id);
-            if (clan) {
-                clan.likes = (clan.likes || 0) + 1;
-                saveData();
-                playSound('ding');
-                showTempMessage("❤️ +1 like pour " + clan.name + " ! Total: " + clan.likes + " likes");
-            }
+            // Stocker le like temporairement
+            let pendingLikes = JSON.parse(localStorage.getItem('pending_clan_likes') || '[]');
+            pendingLikes.push({ id: id, clanId: id });
+            localStorage.setItem('pending_clan_likes', JSON.stringify(pendingLikes));
+            showTempMessage("❤️ Like enregistré ! Il sera visible après synchronisation.");
+            playSound('ding');
+            loadData();
         }
         
         function showTempMessage(msg) {
@@ -515,12 +502,11 @@ INFO PURGE 24
         }
         
         function likeMessage(id) {
-            const msg = globalData.forum.find(m => m.id == id);
-            if (msg) {
-                msg.likes = (msg.likes || 0) + 1;
-                saveData();
-                playSound('ding');
-            }
+            let pendingMsgLikes = JSON.parse(localStorage.getItem('pending_msg_likes') || '[]');
+            pendingMsgLikes.push({ id: id });
+            localStorage.setItem('pending_msg_likes', JSON.stringify(pendingMsgLikes));
+            showTempMessage("💬 Like enregistré !");
+            playSound('ding');
         }
         
         function playSound(type) {
@@ -579,7 +565,7 @@ INFO PURGE 24
             updateRanking();
         }
         
-        document.getElementById('forumForm')?.addEventListener('submit', (e) => {
+        document.getElementById('forumForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const newMsg = {
                 id: Date.now(),
@@ -588,10 +574,11 @@ INFO PURGE 24
                 likes: 0,
                 date: new Date().toLocaleString()
             };
-            globalData.forum.unshift(newMsg);
-            saveData();
+            let pendingForum = JSON.parse(localStorage.getItem('pending_forum') || '[]');
+            pendingForum.unshift(newMsg);
+            localStorage.setItem('pending_forum', JSON.stringify(pendingForum));
+            showTempMessage("✅ Message en attente de validation par Joyboy !");
             playSound('ding');
-            updateForum();
             e.target.reset();
         });
         
@@ -607,7 +594,7 @@ INFO PURGE 24
         
         loadData();
         initMusic();
-        setInterval(() => { loadData(); }, 10000);
+        setInterval(() => { loadData(); }, 15000);
         
         const style = document.createElement('style');
         style.textContent = `
@@ -621,4 +608,3 @@ INFO PURGE 24
     </script>
 </body>
 </html>
-dianny shiro night 𝚂𝙷𝙰𝙳𝙾𝚆 by joyboy
