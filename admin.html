@@ -1,4 +1,4 @@
-JOYBOY 
+INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -142,11 +142,6 @@ JOYBOY
             border-left: 3px solid #ff4444;
             padding-left: 15px;
         }
-        
-        h3 {
-            color: #ff6666;
-            margin: 15px 0 10px;
-        }
     </style>
 </head>
 <body>
@@ -234,7 +229,6 @@ JOYBOY
             displayAdmin();
         }
         
-        // Ajouter un nouveau clan
         function addNewClan() {
             const name = document.getElementById('newClanName').value;
             const leader = document.getElementById('newClanLeader').value;
@@ -253,13 +247,13 @@ JOYBOY
                 score_week: 0,
                 score_month: 0,
                 score_year: 0,
+                likes: 0,
                 created_at: new Date().toISOString()
             };
             
             currentData.clans.push(newClan);
             saveData();
             
-            // Réinitialiser le formulaire
             document.getElementById('newClanName').value = '';
             document.getElementById('newClanLeader').value = '';
             document.getElementById('newClanDesc').value = '';
@@ -278,6 +272,7 @@ JOYBOY
                         <strong>⚔️ ${escapeHtml(clan.name)}</strong> - Chef: ${escapeHtml(clan.leader)}<br>
                         📝 ${escapeHtml(clan.description) || "Aucune description"}<br>
                         📅 Créé le: ${new Date(clan.created_at).toLocaleDateString()}<br>
+                        ❤️ ${clan.likes || 0} likes<br>
                         <button onclick="deleteClan(${clan.id})" class="delete-btn">🗑️ SUPPRIMER CE CLAN</button>
                     </div>
                 `).join('');
@@ -344,4 +339,3 @@ JOYBOY
     </script>
 </body>
 </html>
-joyboy
