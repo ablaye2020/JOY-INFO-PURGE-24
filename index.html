@@ -8,11 +8,7 @@ INFO PURGE 24
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         /* BANDEAU DÉFILANT */
         .marquee {
@@ -30,7 +26,6 @@ INFO PURGE 24
             white-space: nowrap;
             z-index: 1000;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            border-bottom: 2px solid #ff4444;
         }
         
         .marquee-content {
@@ -39,17 +34,11 @@ INFO PURGE 24
             letter-spacing: 3px;
         }
         
-        .marquee-content span {
-            margin: 0 40px;
-        }
+        .marquee-content span { margin: 0 40px; }
         
         @keyframes marquee {
-            0% {
-                transform: translateX(0%);
-            }
-            100% {
-                transform: translateX(-50%);
-            }
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
         }
         
         .floating-dots {
@@ -74,20 +63,10 @@ INFO PURGE 24
         }
         
         @keyframes floatDot {
-            0% {
-                transform: translateY(100vh) translateX(0) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.8;
-            }
-            90% {
-                opacity: 0.8;
-            }
-            100% {
-                transform: translateY(-20vh) translateX(calc(100px * var(--direction))) rotate(360deg);
-                opacity: 0;
-            }
+            0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-20vh) translateX(calc(100px * var(--direction))) rotate(360deg); opacity: 0; }
         }
         
         .video-background {
@@ -108,15 +87,9 @@ INFO PURGE 24
             padding: 20px;
             padding-top: 90px;
             min-height: 100vh;
-            position: relative;
         }
         
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
+        .container { max-width: 1400px; margin: 0 auto; position: relative; z-index: 1; }
         
         header {
             text-align: center;
@@ -210,10 +183,7 @@ INFO PURGE 24
             box-shadow: 0 5px 20px rgba(0,0,0,0.05);
         }
         
-        .section.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
+        .section.active { display: block; animation: fadeIn 0.5s ease; }
         
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
@@ -246,15 +216,8 @@ INFO PURGE 24
             color: #1a1a2e;
         }
         
-        .ranking-tab:hover {
-            background: rgba(255,68,68,0.3);
-        }
-        
-        .ranking-tab.active {
-            background: #ff4444;
-            border-color: #ff4444;
-            color: white;
-        }
+        .ranking-tab:hover { background: rgba(255,68,68,0.3); }
+        .ranking-tab.active { background: #ff4444; border-color: #ff4444; color: white; }
         
         .ranking-item {
             display: flex;
@@ -275,7 +238,6 @@ INFO PURGE 24
         .ranking-item:hover {
             transform: translateX(5px);
             background: linear-gradient(90deg, rgba(255,68,68,0.1) 0%, rgba(255,68,68,0) 100%);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         .ranking-number {
@@ -286,15 +248,8 @@ INFO PURGE 24
             min-width: 70px;
         }
         
-        .clan-icon {
-            font-size: 48px;
-            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
-            transition: transform 0.3s;
-        }
-        
-        .ranking-item:hover .clan-icon {
-            transform: scale(1.1);
-        }
+        .clan-icon { font-size: 48px; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2)); transition: transform 0.3s; }
+        .ranking-item:hover .clan-icon { transform: scale(1.1); }
         
         .ranking-name {
             font-size: 1.4em;
@@ -336,11 +291,7 @@ INFO PURGE 24
             font-weight: bold;
         }
         
-        .clan-like-btn:hover {
-            background: #ff4444;
-            color: white;
-            transform: scale(1.05);
-        }
+        .clan-like-btn:hover { background: #ff4444; color: white; transform: scale(1.05); }
         
         form input, form textarea {
             width: 100%;
@@ -372,10 +323,7 @@ INFO PURGE 24
             font-family: 'Orbitron', monospace;
         }
         
-        button:hover {
-            background: #cc0000;
-            transform: scale(1.02);
-        }
+        button:hover { background: #cc0000; transform: scale(1.02); }
         
         .message {
             background: rgba(255,68,68,0.05);
@@ -386,10 +334,7 @@ INFO PURGE 24
             background-color: #ffffff;
         }
         
-        .message strong {
-            color: #ff4444;
-            font-size: 1.1em;
-        }
+        .message strong { color: #ff4444; font-size: 1.1em; }
         
         .like-btn {
             background: rgba(255,68,68,0.1);
@@ -399,10 +344,7 @@ INFO PURGE 24
             color: #1a1a2e;
         }
         
-        .like-btn:hover {
-            background: #ff4444;
-            color: white;
-        }
+        .like-btn:hover { background: #ff4444; color: white; }
         
         .admin-link {
             position: fixed;
@@ -420,10 +362,7 @@ INFO PURGE 24
             font-family: 'Orbitron', monospace;
         }
         
-        .admin-link:hover {
-            background: #ff4444;
-            color: black;
-        }
+        .admin-link:hover { background: #ff4444; color: black; }
         
         .music-control {
             position: fixed;
@@ -451,10 +390,7 @@ INFO PURGE 24
             color: #1a1a2e;
         }
         
-        .refresh-btn:hover {
-            background: #ff4444;
-            color: white;
-        }
+        .refresh-btn:hover { background: #ff4444; color: white; }
         
         .error-box {
             background: rgba(255,68,68,0.1);
@@ -492,7 +428,6 @@ INFO PURGE 24
     </div>
     
     <div class="floating-dots" id="floatingDots"></div>
-    
     <img class="video-background" src="fond.photo" alt="Fond" onerror="this.style.display='none'">
     
     <div class="container">
@@ -537,6 +472,16 @@ INFO PURGE 24
     </div>
 
     <script>
+        // Configuration GitHub
+        const DATA_URL = "https://raw.githubusercontent.com/ablaye2020/info-purge-24/main/data.json";
+        const GITHUB_API = "https://api.github.com/repos/ablaye2020/info-purge-24/contents/data.json";
+        
+        let currentRankingPeriod = 'week';
+        let backgroundMusic = null;
+        let musicPlaying = false;
+        let globalData = { clans: [], forum: [] };
+        
+        // Création des points volants
         function createFloatingDots() {
             const container = document.getElementById('floatingDots');
             for(let i = 0; i < 50; i++) {
@@ -557,21 +502,17 @@ INFO PURGE 24
             }
         }
         
+        // Icônes des clans
         function getClanIcon(index) {
-            const icons = ['⚔️', '🛡️', '👑', '🏰', '🐉', '⚡', '🔥', '❄️', '🌊', '🌪️', '💀', '🦅', '🐺', '🦁', '🐉', '🏹', '🗡️', '🔱', '⛓️', '🌙', '⭐', '🌀', '🎯', '💎'];
+            const icons = ['⚔️', '🛡️', '👑', '🏰', '🐉', '⚡', '🔥', '❄️', '🌊', '🌪️', '💀', '🦅', '🐺', '🦁', '🏹', '🗡️', '🔱', '⛓️', '🌙', '⭐', '🌀', '🎯', '💎'];
             return icons[index % icons.length];
         }
         
-        const DATA_URL = "https://raw.githubusercontent.com/ablaye2020/info-purge-24/main/data.json";
-        let currentRankingPeriod = 'week';
-        let backgroundMusic = null;
-        let musicPlaying = false;
-        let globalData = { clans: [], forum: [] };
-        
+        // Charger les données depuis GitHub
         async function loadData() {
             try {
                 const response = await fetch(DATA_URL + "?t=" + Date.now());
-                if (!response.ok) throw new Error("Fichier data.json non trouvé");
+                if (!response.ok) throw new Error("Fichier non trouvé");
                 const data = await response.json();
                 globalData = data;
                 if (!globalData.clans) globalData.clans = [];
@@ -579,13 +520,11 @@ INFO PURGE 24
                 updateRanking();
                 updateForum();
             } catch(e) {
-                document.getElementById('rankingList').innerHTML = `<div class="error-box">
-                    ⚠️ Erreur de chargement des données<br>
-                    Le fichier data.json n'existe pas sur GitHub.
-                </div>`;
+                document.getElementById('rankingList').innerHTML = `<div class="error-box">⚠️ Erreur de chargement des données</div>`;
             }
         }
         
+        // Mettre à jour l'affichage du classement
         function updateRanking() {
             let clans = [...globalData.clans];
             
@@ -619,37 +558,39 @@ INFO PURGE 24
                             </div>
                         </div>
                         <span class="ranking-score">⭐ ${score} ${periodLabel}</span>
-                        <button class="clan-like-btn" onclick="likeClan(${clan.id})">❤️ ${clan.likes || 0} likes</button>
+                        <button class="clan-like-btn" onclick="likeClan(${clan.id}, ${clan.likes || 0})">❤️ ${clan.likes || 0} likes</button>
                     </div>
                 `;
             }).join('');
         }
         
-        async function likeClan(id) {
+        // Fonction pour liker un clan (mise à jour directe dans data.json)
+        async function likeClan(id, currentLikes) {
             try {
-                const response = await fetch(DATA_URL + "?t=" + Date.now());
-                const data = await response.json();
-                const clan = data.clans.find(c => c.id === id);
+                // Incrémenter le like localement
+                const newLikes = currentLikes + 1;
+                
+                // Mettre à jour dans globalData
+                const clan = globalData.clans.find(c => c.id === id);
                 if (clan) {
-                    clan.likes = (clan.likes || 0) + 1;
-                    localStorage.setItem('pending_clan_likes', JSON.stringify(data.clans));
-                    showTempMessage("❤️ Like enregistré !");
-                    playSound('ding');
-                    loadData();
+                    clan.likes = newLikes;
                 }
+                
+                // Sauvegarder dans le stockage local pour que l'admin puisse synchroniser
+                localStorage.setItem('pending_clan_likes_' + id, newLikes);
+                localStorage.setItem('needs_sync', 'true');
+                
+                // Mettre à jour l'affichage
+                updateRanking();
+                showTempMessage("❤️ +1 like pour ce clan !");
+                playSound('ding');
+                
             } catch(e) {
                 showTempMessage("❌ Erreur, réessayez");
             }
         }
         
-        function showTempMessage(msg) {
-            const tempDiv = document.createElement('div');
-            tempDiv.style.cssText = 'position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:#ff4444; color:white; padding:10px 20px; border-radius:30px; z-index:1000; animation:fadeOut 2s ease forwards; font-family:Orbitron;';
-            tempDiv.innerHTML = msg;
-            document.body.appendChild(tempDiv);
-            setTimeout(() => { tempDiv.remove(); }, 2000);
-        }
-        
+        // Mettre à jour l'affichage du forum
         function updateForum() {
             const forum = globalData.forum || [];
             const container = document.getElementById('forumMessages');
@@ -661,26 +602,35 @@ INFO PURGE 24
                 <div class="message">
                     <strong>🔥 ${escapeHtml(msg.author)}</strong> <small>${msg.date}</small>
                     <p style="margin-top:8px;">${escapeHtml(msg.message)}</p>
-                    <button class="like-btn" onclick="likeMessage(${msg.id})">❤️ ${msg.likes || 0} likes</button>
+                    <button class="like-btn" onclick="likeMessage(${msg.id}, ${msg.likes || 0})">❤️ ${msg.likes || 0} likes</button>
                 </div>
             `).join('');
         }
         
-        async function likeMessage(id) {
+        // Fonction pour liker un message
+        async function likeMessage(id, currentLikes) {
             try {
-                const response = await fetch(DATA_URL + "?t=" + Date.now());
-                const data = await response.json();
-                const msg = data.forum.find(m => m.id === id);
+                const newLikes = currentLikes + 1;
+                const msg = globalData.forum.find(m => m.id === id);
                 if (msg) {
-                    msg.likes = (msg.likes || 0) + 1;
-                    localStorage.setItem('pending_msg_likes', JSON.stringify(data.forum));
-                    showTempMessage("💬 Like enregistré !");
-                    playSound('ding');
-                    loadData();
+                    msg.likes = newLikes;
                 }
+                localStorage.setItem('pending_msg_likes_' + id, newLikes);
+                localStorage.setItem('needs_sync', 'true');
+                updateForum();
+                showTempMessage("💬 +1 like pour ce message !");
+                playSound('ding');
             } catch(e) {
                 showTempMessage("❌ Erreur");
             }
+        }
+        
+        function showTempMessage(msg) {
+            const tempDiv = document.createElement('div');
+            tempDiv.style.cssText = 'position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:#ff4444; color:white; padding:10px 20px; border-radius:30px; z-index:1000; animation:fadeOut 2s ease forwards; font-family:Orbitron;';
+            tempDiv.innerHTML = msg;
+            document.body.appendChild(tempDiv);
+            setTimeout(() => { tempDiv.remove(); }, 2000);
         }
         
         function playSound(type) {
@@ -706,7 +656,7 @@ INFO PURGE 24
         
         function initMusic() {
             try {
-                backgroundMusic = new Audio('song.mp3.m4a');
+                backgroundMusic = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3');
                 backgroundMusic.loop = true;
                 backgroundMusic.volume = 0.15;
             } catch(e) {}
@@ -739,6 +689,7 @@ INFO PURGE 24
             updateRanking();
         }
         
+        // Publication de message (stocké en attente)
         document.getElementById('forumForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const newMsg = {
@@ -751,7 +702,8 @@ INFO PURGE 24
             let pendingForum = JSON.parse(localStorage.getItem('pending_forum') || '[]');
             pendingForum.unshift(newMsg);
             localStorage.setItem('pending_forum', JSON.stringify(pendingForum));
-            showTempMessage("✅ Message en attente de validation !");
+            localStorage.setItem('needs_sync', 'true');
+            showTempMessage("✅ Message en attente de validation par Joyboy !");
             playSound('ding');
             e.target.reset();
         });
@@ -766,10 +718,13 @@ INFO PURGE 24
             });
         }
         
+        // Initialisation
         createFloatingDots();
         loadData();
         initMusic();
-        setInterval(() => { loadData(); }, 15000);
+        
+        // Rafraîchissement automatique toutes les 10 secondes
+        setInterval(() => { loadData(); }, 10000);
         
         const style = document.createElement('style');
         style.textContent = `@keyframes fadeOut { 0% { opacity: 1; transform: translateX(-50%) translateY(0); } 70% { opacity: 1; } 100% { opacity: 0; transform: translateX(-50%) translateY(-20px); } }`;
@@ -777,4 +732,3 @@ INFO PURGE 24
     </script>
 </body>
 </html>
-la voix de la purge ..a vous mes très chers purgeurs et purgeuses 
