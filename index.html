@@ -1,4 +1,4 @@
-INFO PURGE 24 by JOYBOY
+JOY INFO PURGE 24 PRODUCTION 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -14,7 +14,7 @@ INFO PURGE 24 by JOYBOY
             box-sizing: border-box;
         }
         
-        /* BANDEAU DÉFILANT NEWS */
+        /* BANDEAU NEWS DÉFILANT */
         .breaking-news {
             position: fixed;
             top: 0;
@@ -503,7 +503,7 @@ INFO PURGE 24 by JOYBOY
     
     <div class="container">
         <a href="admin.html" class="admin-link">⚡ JOYBOY ADMIN ⚡</a>
-        <div class="music-control" onclick="toggleMusic()" id="musicBtn">🎵🔊</div>
+        <div class="music-control" onclick="toggleMusic()" id="musicBtn">🎵🔇</div>
         
         <div class="journal-header">
             <div class="live-badge">🔴 EN DIRECT</div>
@@ -549,7 +549,7 @@ INFO PURGE 24 by JOYBOY
         const DATA_URL = "https://raw.githubusercontent.com/ablaye2020/info-purge-24/main/data.json";
         let currentRankingPeriod = 'week';
         let backgroundMusic = null;
-        let musicPlaying = true;  // La musique démarre automatiquement
+        let musicPlaying = false;
         let globalData = { clans: [], forum: [] };
         
         async function loadData() {
@@ -704,12 +704,9 @@ INFO PURGE 24 by JOYBOY
         
         function initMusic() {
             try {
-                // METTEZ VOTRE FICHIER MUSIQUE ICI
-                backgroundMusic = new Audio('song.mp3.m4a.');
+                backgroundMusic = new Audio('song.mp3.m4a');
                 backgroundMusic.loop = true;
                 backgroundMusic.volume = 0.2;
-                // LA MUSIQUE SE LANCE AUTOMATIQUEMENT
-                backgroundMusic.play().catch(e => console.log("Auto-play bloqué par le navigateur"));
             } catch(e) {}
         }
         
@@ -775,10 +772,21 @@ INFO PURGE 24 by JOYBOY
         initMusic();
         setInterval(() => { loadData(); }, 5000);
         
+        // Musique au premier clic n'importe où
+        document.body.addEventListener('click', function startMusic() {
+            if (backgroundMusic && !musicPlaying) {
+                backgroundMusic.play().then(() => {
+                    musicPlaying = true;
+                    document.getElementById('musicBtn').innerHTML = '🎵🔊';
+                }).catch(e => console.log("Erreur:", e));
+            }
+            document.body.removeEventListener('click', startMusic);
+        });
+        
         const style = document.createElement('style');
         style.textContent = `@keyframes fadeOut { 0% { opacity: 1; transform: translateX(-50%) translateY(0); } 70% { opacity: 1; } 100% { opacity: 0; transform: translateX(-50%) translateY(-20px); } }`;
         document.head.appendChild(style);
     </script>
 </body>
 </html>
-info purge 24 la voix de la purge by night , shiro , shadow, William et dianny
+NIGHT SHIRO DIANNY WILLIAM SHADOW 
