@@ -4,43 +4,56 @@ INFO PURGE 24
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INFO PURGE 24 - Classement des Clans</title>
+    <title>INFO PURGE 24 - Le Journal des Clans</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Bebas+Neue&display=swap');
         
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         
-        /* BANDEAU DÉFILANT */
-        .marquee {
+        /* BANDEAU DÉFILANT NEWS */
+        .breaking-news {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            background: linear-gradient(90deg, #ff4444, #1a1a2e, #ff4444);
-            color: white;
+            background: #000000;
+            color: #ff0000;
             font-family: 'Orbitron', monospace;
-            font-size: 1.5em;
+            font-size: 1.2em;
             font-weight: bold;
-            padding: 12px 0;
+            padding: 10px 0;
             overflow: hidden;
             white-space: nowrap;
             z-index: 1000;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border-bottom: 2px solid #ff0000;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
         
-        .marquee-content {
+        .breaking-news span {
             display: inline-block;
-            animation: marquee 20s linear infinite;
-            letter-spacing: 3px;
+            animation: scrollNews 25s linear infinite;
         }
         
-        .marquee-content span { margin: 0 40px; }
-        
-        @keyframes marquee {
-            0% { transform: translateX(0%); }
-            100% { transform: translateX(-50%); }
+        @keyframes scrollNews {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
         }
         
+        .breaking-label {
+            background: #ff0000;
+            color: white;
+            padding: 5px 15px;
+            margin-right: 20px;
+            display: inline-block;
+            font-size: 0.9em;
+        }
+        
+        /* POINTS VOLANTS */
         .floating-dots {
             position: fixed;
             top: 0;
@@ -54,52 +67,58 @@ INFO PURGE 24
         
         .dot {
             position: absolute;
-            width: 4px;
-            height: 4px;
-            background: radial-gradient(circle, #ff4444, #ff8888);
+            width: 3px;
+            height: 3px;
+            background: radial-gradient(circle, #ff0000, #ff4444);
             border-radius: 50%;
-            opacity: 0.6;
+            opacity: 0.5;
             animation: floatDot linear infinite;
         }
         
         @keyframes floatDot {
-            0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity: 0; }
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
             10% { opacity: 0.8; }
             90% { opacity: 0.8; }
-            100% { transform: translateY(-20vh) translateX(calc(100px * var(--direction))) rotate(360deg); opacity: 0; }
-        }
-        
-        .video-background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-            object-fit: cover;
-            opacity: 0.2;
+            100% { transform: translateY(-20vh) translateX(calc(100px * var(--direction))); opacity: 0; }
         }
         
         body {
             font-family: 'Rajdhani', sans-serif;
-            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
-            color: #1a1a2e;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+            color: #ffffff;
             padding: 20px;
-            padding-top: 90px;
+            padding-top: 80px;
             min-height: 100vh;
         }
         
-        .container { max-width: 1400px; margin: 0 auto; position: relative; z-index: 1; }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
         
-        header {
+        /* HEADER JOURNAL */
+        .journal-header {
             text-align: center;
-            padding: 40px 20px;
+            padding: 30px 20px;
             margin-bottom: 30px;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(10px);
             border-radius: 20px;
-            border: 1px solid rgba(255, 68, 68, 0.3);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(255,0,0,0.1);
+            position: relative;
+        }
+        
+        .journal-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff0000, #ffffff, #ff0000);
         }
         
         .live-badge {
@@ -108,11 +127,13 @@ INFO PURGE 24
             color: white;
             font-size: 12px;
             font-weight: bold;
-            padding: 4px 12px;
+            padding: 5px 15px;
             border-radius: 20px;
             margin-bottom: 15px;
             animation: pulse 1.5s infinite;
             font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
         
         @keyframes pulse {
@@ -122,15 +143,24 @@ INFO PURGE 24
         }
         
         h1 {
-            font-family: 'Orbitron', monospace;
-            font-size: 3.5em;
+            font-family: 'Bebas Neue', 'Orbitron', monospace;
+            font-size: 5em;
             font-weight: 900;
-            letter-spacing: 5px;
-            background: linear-gradient(135deg, #1a1a2e, #ff4444, #1a1a2e);
+            letter-spacing: 8px;
+            background: linear-gradient(135deg, #ffffff, #ff0000, #ffffff);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            text-shadow: 0 0 30px rgba(255,0,0,0.3);
             margin-bottom: 10px;
+        }
+        
+        .journal-date {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8em;
+            color: #ff6666;
+            letter-spacing: 2px;
+            margin-top: 10px;
         }
         
         .citation {
@@ -143,9 +173,11 @@ INFO PURGE 24
             border-bottom: 1px solid rgba(255,68,68,0.3);
             display: inline-block;
             padding: 10px 20px;
+            font-family: 'Rajdhani', sans-serif;
         }
         
-        nav {
+        /* NAVIGATION */
+        .nav-news {
             display: flex;
             gap: 15px;
             justify-content: center;
@@ -153,9 +185,9 @@ INFO PURGE 24
             margin-top: 30px;
         }
         
-        nav button {
-            background: linear-gradient(135deg, #1a1a2e, #2d2d44);
-            border: none;
+        .nav-news button {
+            background: rgba(0,0,0,0.8);
+            border: 1px solid #ff0000;
             padding: 12px 28px;
             font-family: 'Orbitron', monospace;
             font-weight: bold;
@@ -163,27 +195,34 @@ INFO PURGE 24
             cursor: pointer;
             transition: all 0.3s;
             border-radius: 30px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9em;
         }
         
-        nav button:hover {
-            background: #ff4444;
+        .nav-news button:hover {
+            background: #ff0000;
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(255,68,68,0.3);
+            box-shadow: 0 5px 20px rgba(255,0,0,0.4);
+            border-color: #ffffff;
         }
         
+        /* SECTIONS */
         .section {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,68,68,0.2);
+            border: 1px solid rgba(255,0,0,0.3);
             border-radius: 20px;
             padding: 25px;
             margin-bottom: 30px;
             display: none;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         }
         
-        .section.active { display: block; animation: fadeIn 0.5s ease; }
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
         
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
@@ -192,12 +231,16 @@ INFO PURGE 24
         
         .section h2 {
             font-family: 'Orbitron', monospace;
-            color: #ff4444;
+            color: #ff0000;
             margin-bottom: 20px;
-            border-left: 4px solid #ff4444;
+            border-left: 4px solid #ff0000;
             padding-left: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 1.5em;
         }
         
+        /* CLASSEMENT */
         .ranking-tabs {
             display: flex;
             gap: 10px;
@@ -206,38 +249,48 @@ INFO PURGE 24
         }
         
         .ranking-tab {
-            background: rgba(255,68,68,0.1);
-            border: 1px solid rgba(255,68,68,0.3);
+            background: rgba(255,0,0,0.1);
+            border: 1px solid rgba(255,0,0,0.3);
             padding: 8px 20px;
             border-radius: 25px;
             cursor: pointer;
             transition: all 0.3s;
             font-weight: bold;
-            color: #1a1a2e;
+            color: #ffffff;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8em;
         }
         
-        .ranking-tab:hover { background: rgba(255,68,68,0.3); }
-        .ranking-tab.active { background: #ff4444; border-color: #ff4444; color: white; }
+        .ranking-tab:hover {
+            background: rgba(255,0,0,0.3);
+        }
+        
+        .ranking-tab.active {
+            background: #ff0000;
+            border-color: #ff0000;
+            color: white;
+        }
         
         .ranking-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 20px 18px;
-            background: linear-gradient(90deg, rgba(255,68,68,0.05) 0%, rgba(255,68,68,0) 100%);
+            background: linear-gradient(90deg, rgba(255,0,0,0.1) 0%, rgba(255,0,0,0) 100%);
             margin: 12px 0;
             border-radius: 12px;
-            border-left: 4px solid #ff4444;
+            border-left: 4px solid #ff0000;
             flex-wrap: wrap;
             gap: 15px;
             transition: all 0.3s;
-            background-color: #ffffff;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            background-color: rgba(0,0,0,0.5);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
         
         .ranking-item:hover {
             transform: translateX(5px);
-            background: linear-gradient(90deg, rgba(255,68,68,0.1) 0%, rgba(255,68,68,0) 100%);
+            background: linear-gradient(90deg, rgba(255,0,0,0.2) 0%, rgba(255,0,0,0) 100%);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
         
         .ranking-number {
@@ -248,20 +301,27 @@ INFO PURGE 24
             min-width: 70px;
         }
         
-        .clan-icon { font-size: 48px; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2)); transition: transform 0.3s; }
-        .ranking-item:hover .clan-icon { transform: scale(1.1); }
+        .clan-icon {
+            font-size: 48px;
+            filter: drop-shadow(0 0 5px rgba(255,0,0,0.5));
+            transition: transform 0.3s;
+        }
+        
+        .ranking-item:hover .clan-icon {
+            transform: scale(1.1);
+        }
         
         .ranking-name {
             font-size: 1.4em;
             font-weight: 800;
-            color: #1a1a2e;
+            color: #ffffff;
             letter-spacing: 1px;
         }
         
         .ranking-leader {
             font-size: 0.9em;
             font-weight: 500;
-            color: #2c3e66;
+            color: #ff8888;
             margin-top: 4px;
         }
         
@@ -269,9 +329,9 @@ INFO PURGE 24
             flex: 1;
             font-size: 1.3em;
             font-weight: bold;
-            color: #1a1a2e;
+            color: #ffaa00;
             font-family: 'Orbitron', monospace;
-            background: rgba(255,68,68,0.1);
+            background: rgba(255,0,0,0.1);
             padding: 8px 15px;
             border-radius: 20px;
             text-align: center;
@@ -279,40 +339,45 @@ INFO PURGE 24
         }
         
         .clan-like-btn {
-            background: rgba(255,68,68,0.1);
-            border: 1px solid rgba(255,68,68,0.3);
+            background: rgba(255,0,0,0.2);
+            border: 1px solid rgba(255,0,0,0.5);
             padding: 8px 18px;
             border-radius: 30px;
             font-size: 14px;
             cursor: pointer;
             transition: all 0.3s;
             font-family: 'Orbitron', monospace;
-            color: #1a1a2e;
+            color: #ffffff;
             font-weight: bold;
         }
         
-        .clan-like-btn:hover { background: #ff4444; color: white; transform: scale(1.05); }
+        .clan-like-btn:hover {
+            background: #ff0000;
+            color: white;
+            transform: scale(1.05);
+        }
         
+        /* FORMULAIRES */
         form input, form textarea {
             width: 100%;
             padding: 14px;
             margin: 10px 0;
             border-radius: 10px;
-            border: 1px solid rgba(255,68,68,0.3);
-            background: #ffffff;
-            color: #1a1a2e;
+            border: 1px solid rgba(255,0,0,0.3);
+            background: rgba(0,0,0,0.6);
+            color: #ffffff;
             font-family: 'Rajdhani', sans-serif;
             font-size: 1em;
         }
         
         form input:focus, form textarea:focus {
             outline: none;
-            border-color: #ff4444;
-            box-shadow: 0 0 5px rgba(255,68,68,0.3);
+            border-color: #ff0000;
+            box-shadow: 0 0 10px rgba(255,0,0,0.3);
         }
         
         button {
-            background: #ff4444;
+            background: #ff0000;
             border: none;
             padding: 12px 25px;
             border-radius: 30px;
@@ -321,55 +386,72 @@ INFO PURGE 24
             cursor: pointer;
             transition: all 0.3s;
             font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
-        button:hover { background: #cc0000; transform: scale(1.02); }
+        button:hover {
+            background: #cc0000;
+            transform: scale(1.02);
+        }
         
+        /* MESSAGES FORUM */
         .message {
-            background: rgba(255,68,68,0.05);
-            border: 1px solid rgba(255,68,68,0.2);
+            background: rgba(255,0,0,0.05);
+            border: 1px solid rgba(255,0,0,0.2);
             padding: 15px;
             margin: 10px 0;
             border-radius: 12px;
-            background-color: #ffffff;
+            background-color: rgba(0,0,0,0.5);
         }
         
-        .message strong { color: #ff4444; font-size: 1.1em; }
+        .message strong {
+            color: #ff4444;
+            font-size: 1.1em;
+        }
         
         .like-btn {
-            background: rgba(255,68,68,0.1);
+            background: rgba(255,0,0,0.2);
             padding: 5px 12px;
             font-size: 12px;
             margin-top: 10px;
-            color: #1a1a2e;
+            color: #ffffff;
         }
         
-        .like-btn:hover { background: #ff4444; color: white; }
+        .like-btn:hover {
+            background: #ff0000;
+            color: white;
+        }
         
+        /* ADMIN LINK */
         .admin-link {
             position: fixed;
             bottom: 20px;
             left: 20px;
-            background: rgba(0,0,0,0.8);
-            border: 1px solid #ff4444;
+            background: rgba(0,0,0,0.9);
+            border: 1px solid #ff0000;
             padding: 8px 16px;
             border-radius: 25px;
             font-size: 12px;
-            color: #ff8888;
+            color: #ff6666;
             text-decoration: none;
             z-index: 100;
-            backdrop-filter: blur(5px);
             font-family: 'Orbitron', monospace;
+            backdrop-filter: blur(5px);
         }
         
-        .admin-link:hover { background: #ff4444; color: black; }
+        .admin-link:hover {
+            background: #ff0000;
+            color: black;
+        }
         
+        /* MUSIQUE */
         .music-control {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: rgba(0,0,0,0.8);
-            border: 1px solid #ff4444;
+            background: rgba(0,0,0,0.9);
+            border: 1px solid #ff0000;
             border-radius: 50%;
             width: 50px;
             height: 50px;
@@ -379,73 +461,64 @@ INFO PURGE 24
             cursor: pointer;
             font-size: 24px;
             z-index: 100;
-            backdrop-filter: blur(5px);
             color: white;
+            backdrop-filter: blur(5px);
         }
         
         .refresh-btn {
-            background: rgba(255,68,68,0.2);
-            border: 1px solid #ff4444;
+            background: rgba(255,0,0,0.2);
+            border: 1px solid #ff0000;
             margin-bottom: 20px;
-            color: #1a1a2e;
+            color: #ffffff;
         }
         
-        .refresh-btn:hover { background: #ff4444; color: white; }
-        
-        .error-box {
-            background: rgba(255,68,68,0.1);
-            border: 1px solid #ff4444;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            margin: 20px;
-            color: #1a1a2e;
+        .refresh-btn:hover {
+            background: #ff0000;
+            color: white;
         }
         
         @media (max-width: 768px) {
-            h1 { font-size: 2em; letter-spacing: 2px; }
+            h1 { font-size: 2.5em; letter-spacing: 3px; }
             .ranking-item { flex-direction: column; text-align: center; }
             .ranking-number { font-size: 24px; }
             .clan-icon { font-size: 36px; }
             .ranking-name { font-size: 1.2em; }
-            .marquee { font-size: 0.9em; padding: 8px 0; }
+            .breaking-news { font-size: 0.8em; }
             body { padding-top: 70px; }
         }
     </style>
 </head>
 <body>
-    <!-- BANDEAU DÉFILANT -->
-    <div class="marquee">
-        <div class="marquee-content">
-            <span>⚡ INFO PURGE 24 ⚡</span>
-            <span>🏆 LE RESPECT NE SE DEMANDE PAS, IL S'IMPOSE 🏆</span>
-            <span>⚡ INFO PURGE 24 ⚡</span>
-            <span>👑 JOYBOY 👑</span>
-            <span>⚡ INFO PURGE 24 ⚡</span>
-            <span>🔥 PURGE TOUS LES JOURS 🔥</span>
-            <span>⚡ INFO PURGE 24 ⚡</span>
-        </div>
+    <!-- BANDEAU NEWS DÉFILANT -->
+    <div class="breaking-news">
+        <span>
+            <span class="breaking-label">🔴 LIVE</span>
+            INFO PURGE 24 - LE JOURNAL DES CLANS ⚡ LES SCORES SONT MIS À JOUR EN DIRECT ⚡ LE RESPECT NE SE DEMANDE PAS, IL S'IMPOSE ⚡
+            <span style="color:#ff0000;">||</span> BIENVENUE DANS LA COMMUNAUTÉ <span style="color:#ff0000;">||</span>
+            PURGE TOUS LES JOURS <span style="color:#ff0000;">||</span> JOYBOY 🔥
+        </span>
     </div>
     
     <div class="floating-dots" id="floatingDots"></div>
-    <img class="video-background" src="fond.photo" alt="Fond" onerror="this.style.display='none'">
     
     <div class="container">
-        <a href="admin.html" class="admin-link">⚡ JOYBOY ADMIN</a>
-        <div class="music-control" onclick="toggleMusic()" id="musicBtn">🎵</div>
+        <a href="admin.html" class="admin-link">⚡ JOYBOY ADMIN ⚡</a>
+        <div class="music-control" onclick="toggleMusic()" id="musicBtn">🎵🔊</div>
         
-        <header>
-            <div class="live-badge">🔴 LIVE</div>
-            <h1>⚡ INFO PURGE 24 ⚡</h1>
+        <div class="journal-header">
+            <div class="live-badge">🔴 EN DIRECT</div>
+            <h1>INFO PURGE 24</h1>
+            <div class="journal-date">LE JOURNAL DES CLANS • ÉDITION SPÉCIALE</div>
             <div class="citation">"Le respect ne se demande pas, il s'impose" - Joyboy</div>
-            <nav>
-                <button onclick="showSection('ranking')">🏆 CLASSEMENT</button>
+            <div class="nav-news">
+                <button onclick="showSection('ranking')">🏆 CLASSEMENT OFFICIEL</button>
                 <button onclick="showSection('forum')">💬 FORUM PURGE</button>
-            </nav>
-        </header>
+            </div>
+        </div>
 
+        <!-- SECTION CLASSEMENT -->
         <div id="ranking" class="section active">
-            <h2>🏆 CLASSEMENT DES CLANS</h2>
+            <h2>🏆 CLASSEMENT OFFICIEL DES CLANS</h2>
             <button class="refresh-btn" onclick="loadData()">🔄 RAFRAÎCHIR</button>
             <div class="ranking-tabs">
                 <div class="ranking-tab active" onclick="showRankingPeriod('week')">📅 SEMAINE</div>
@@ -453,62 +526,32 @@ INFO PURGE 24
                 <div class="ranking-tab" onclick="showRankingPeriod('year')">🗓️ ANNÉE</div>
             </div>
             <div id="rankingList">
-                <div style="text-align:center; padding:50px;">⏳ Chargement des données...</div>
+                <div style="text-align:center; padding:50px;">⏳ CHARGEMENT DES DONNÉES...</div>
             </div>
         </div>
 
+        <!-- SECTION FORUM -->
         <div id="forum" class="section">
-            <h2>💬 FORUM PURGE 24</h2>
+            <h2>💬 FORUM PURGE - ESPACE D'ÉCHANGE</h2>
             <button class="refresh-btn" onclick="loadData()">🔄 RAFRAÎCHIR</button>
             <form id="forumForm">
-                <input type="text" id="authorName" placeholder="Votre pseudo" required>
-                <textarea id="forumMessage" placeholder="Votre message" rows="3" required></textarea>
+                <input type="text" id="authorName" placeholder="VOTRE PSEUDO" required>
+                <textarea id="forumMessage" placeholder="VOTRE MESSAGE" rows="3" required></textarea>
                 <button type="submit">📢 PUBLIER</button>
             </form>
             <div id="forumMessages">
-                <div style="text-align:center; padding:50px;">⏳ Chargement...</div>
+                <div style="text-align:center; padding:50px;">⏳ CHARGEMENT DES MESSAGES...</div>
             </div>
         </div>
     </div>
 
     <script>
-        // Configuration GitHub
         const DATA_URL = "https://raw.githubusercontent.com/ablaye2020/info-purge-24/main/data.json";
-        const GITHUB_API = "https://api.github.com/repos/ablaye2020/info-purge-24/contents/data.json";
-        
         let currentRankingPeriod = 'week';
         let backgroundMusic = null;
-        let musicPlaying = false;
+        let musicPlaying = true;  // La musique démarre automatiquement
         let globalData = { clans: [], forum: [] };
         
-        // Création des points volants
-        function createFloatingDots() {
-            const container = document.getElementById('floatingDots');
-            for(let i = 0; i < 50; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'dot';
-                const size = Math.random() * 6 + 2;
-                const duration = Math.random() * 8 + 4;
-                const delay = Math.random() * 10;
-                const startX = Math.random() * 100;
-                const direction = Math.random() > 0.5 ? 1 : -1;
-                dot.style.width = size + 'px';
-                dot.style.height = size + 'px';
-                dot.style.left = startX + '%';
-                dot.style.animationDuration = duration + 's';
-                dot.style.animationDelay = delay + 's';
-                dot.style.setProperty('--direction', direction);
-                container.appendChild(dot);
-            }
-        }
-        
-        // Icônes des clans
-        function getClanIcon(index) {
-            const icons = ['⚔️', '🛡️', '👑', '🏰', '🐉', '⚡', '🔥', '❄️', '🌊', '🌪️', '💀', '🦅', '🐺', '🦁', '🏹', '🗡️', '🔱', '⛓️', '🌙', '⭐', '🌀', '🎯', '💎'];
-            return icons[index % icons.length];
-        }
-        
-        // Charger les données depuis GitHub
         async function loadData() {
             try {
                 const response = await fetch(DATA_URL + "?t=" + Date.now());
@@ -520,11 +563,11 @@ INFO PURGE 24
                 updateRanking();
                 updateForum();
             } catch(e) {
-                document.getElementById('rankingList').innerHTML = `<div class="error-box">⚠️ Erreur de chargement des données</div>`;
+                console.error("Erreur:", e);
+                document.getElementById('rankingList').innerHTML = '<div style="text-align:center; padding:50px;">⚠️ ERREUR DE CHARGEMENT</div>';
             }
         }
         
-        // Mettre à jour l'affichage du classement
         function updateRanking() {
             let clans = [...globalData.clans];
             
@@ -538,7 +581,7 @@ INFO PURGE 24
             
             const container = document.getElementById('rankingList');
             if (clans.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:50px;">🏆 Aucun clan enregistré pour le moment.</div>';
+                container.innerHTML = '<div style="text-align:center; padding:50px;">🏆 AUCUN CLAN ENREGISTRÉ</div>';
                 return;
             }
             
@@ -564,38 +607,25 @@ INFO PURGE 24
             }).join('');
         }
         
-        // Fonction pour liker un clan (mise à jour directe dans data.json)
-        async function likeClan(id, currentLikes) {
-            try {
-                // Incrémenter le like localement
-                const newLikes = currentLikes + 1;
-                
-                // Mettre à jour dans globalData
-                const clan = globalData.clans.find(c => c.id === id);
-                if (clan) {
-                    clan.likes = newLikes;
-                }
-                
-                // Sauvegarder dans le stockage local pour que l'admin puisse synchroniser
-                localStorage.setItem('pending_clan_likes_' + id, newLikes);
-                localStorage.setItem('needs_sync', 'true');
-                
-                // Mettre à jour l'affichage
+        function likeClan(id, currentLikes) {
+            let pendingLikes = JSON.parse(localStorage.getItem('pending_clan_likes') || '[]');
+            pendingLikes.push({ id: id, likes: currentLikes + 1 });
+            localStorage.setItem('pending_clan_likes', JSON.stringify(pendingLikes));
+            showTempMessage("❤️ LIKE ENREGISTRÉ !");
+            playSound('ding');
+            
+            const clan = globalData.clans.find(c => c.id === id);
+            if (clan) {
+                clan.likes = currentLikes + 1;
                 updateRanking();
-                showTempMessage("❤️ +1 like pour ce clan !");
-                playSound('ding');
-                
-            } catch(e) {
-                showTempMessage("❌ Erreur, réessayez");
             }
         }
         
-        // Mettre à jour l'affichage du forum
         function updateForum() {
             const forum = globalData.forum || [];
             const container = document.getElementById('forumMessages');
             if (forum.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:50px;">💬 Soyez le premier à commenter !</div>';
+                container.innerHTML = '<div style="text-align:center; padding:50px;">💬 SOYEZ LE PREMIER À COMMENTER !</div>';
                 return;
             }
             container.innerHTML = forum.map(msg => `
@@ -607,27 +637,45 @@ INFO PURGE 24
             `).join('');
         }
         
-        // Fonction pour liker un message
-        async function likeMessage(id, currentLikes) {
-            try {
-                const newLikes = currentLikes + 1;
-                const msg = globalData.forum.find(m => m.id === id);
-                if (msg) {
-                    msg.likes = newLikes;
-                }
-                localStorage.setItem('pending_msg_likes_' + id, newLikes);
-                localStorage.setItem('needs_sync', 'true');
+        function likeMessage(id, currentLikes) {
+            let pendingMsgLikes = JSON.parse(localStorage.getItem('pending_msg_likes') || '[]');
+            pendingMsgLikes.push({ id: id, likes: currentLikes + 1 });
+            localStorage.setItem('pending_msg_likes', JSON.stringify(pendingMsgLikes));
+            showTempMessage("💬 LIKE ENREGISTRÉ !");
+            playSound('ding');
+            
+            const msg = globalData.forum.find(m => m.id === id);
+            if (msg) {
+                msg.likes = currentLikes + 1;
                 updateForum();
-                showTempMessage("💬 +1 like pour ce message !");
-                playSound('ding');
-            } catch(e) {
-                showTempMessage("❌ Erreur");
             }
+        }
+        
+        document.getElementById('forumForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newMsg = {
+                id: Date.now(),
+                author: document.getElementById('authorName').value,
+                message: document.getElementById('forumMessage').value,
+                likes: 0,
+                date: new Date().toLocaleString()
+            };
+            let pendingForum = JSON.parse(localStorage.getItem('pending_forum') || '[]');
+            pendingForum.unshift(newMsg);
+            localStorage.setItem('pending_forum', JSON.stringify(pendingForum));
+            showTempMessage("✅ MESSAGE EN ATTENTE DE VALIDATION !");
+            playSound('ding');
+            e.target.reset();
+        });
+        
+        function getClanIcon(index) {
+            const icons = ['⚔️', '🛡️', '👑', '🏰', '🐉', '⚡', '🔥', '❄️', '🌊', '🌪️', '💀', '🦅', '🐺', '🦁', '🏹', '🗡️', '🔱', '⛓️', '🌙', '⭐'];
+            return icons[index % icons.length];
         }
         
         function showTempMessage(msg) {
             const tempDiv = document.createElement('div');
-            tempDiv.style.cssText = 'position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:#ff4444; color:white; padding:10px 20px; border-radius:30px; z-index:1000; animation:fadeOut 2s ease forwards; font-family:Orbitron;';
+            tempDiv.style.cssText = 'position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:#ff0000; color:white; padding:10px 20px; border-radius:30px; z-index:1000; animation:fadeOut 2s ease forwards; font-family:Orbitron; font-weight:bold;';
             tempDiv.innerHTML = msg;
             document.body.appendChild(tempDiv);
             setTimeout(() => { tempDiv.remove(); }, 2000);
@@ -641,7 +689,7 @@ INFO PURGE 24
                 oscillator.connect(gainNode);
                 gainNode.connect(audioContext.destination);
                 oscillator.type = 'sine';
-                gainNode.gain.value = 0.2;
+                gainNode.gain.value = 0.15;
                 if(type === 'ding') {
                     oscillator.frequency.value = 880;
                     oscillator.start();
@@ -656,9 +704,12 @@ INFO PURGE 24
         
         function initMusic() {
             try {
-                backgroundMusic = new Audio('song.mp3.m4a');
+                // METTEZ VOTRE FICHIER MUSIQUE ICI
+                backgroundMusic = new Audio('musique.mp3');
                 backgroundMusic.loop = true;
-                backgroundMusic.volume = 0.15;
+                backgroundMusic.volume = 0.2;
+                // LA MUSIQUE SE LANCE AUTOMATIQUEMENT
+                backgroundMusic.play().catch(e => console.log("Auto-play bloqué par le navigateur"));
             } catch(e) {}
         }
         
@@ -667,9 +718,9 @@ INFO PURGE 24
             if(musicPlaying) {
                 backgroundMusic.pause();
                 musicPlaying = false;
-                document.getElementById('musicBtn').innerHTML = '🎵';
+                document.getElementById('musicBtn').innerHTML = '🎵🔇';
             } else {
-                backgroundMusic.play().catch(e => console.log("Auto-play bloqué"));
+                backgroundMusic.play().catch(e => console.log("Erreur"));
                 musicPlaying = true;
                 document.getElementById('musicBtn').innerHTML = '🎵🔊';
             }
@@ -689,25 +740,6 @@ INFO PURGE 24
             updateRanking();
         }
         
-        // Publication de message (stocké en attente)
-        document.getElementById('forumForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const newMsg = {
-                id: Date.now(),
-                author: document.getElementById('authorName').value,
-                message: document.getElementById('forumMessage').value,
-                likes: 0,
-                date: new Date().toLocaleString()
-            };
-            let pendingForum = JSON.parse(localStorage.getItem('pending_forum') || '[]');
-            pendingForum.unshift(newMsg);
-            localStorage.setItem('pending_forum', JSON.stringify(pendingForum));
-            localStorage.setItem('needs_sync', 'true');
-            showTempMessage("✅ Message en attente de validation par Joyboy !");
-            playSound('ding');
-            e.target.reset();
-        });
-        
         function escapeHtml(str) {
             if(!str) return '';
             return str.replace(/[&<>]/g, function(m) {
@@ -718,13 +750,30 @@ INFO PURGE 24
             });
         }
         
-        // Initialisation
+        function createFloatingDots() {
+            const container = document.getElementById('floatingDots');
+            for(let i = 0; i < 60; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                const size = Math.random() * 5 + 2;
+                const duration = Math.random() * 10 + 5;
+                const delay = Math.random() * 15;
+                const startX = Math.random() * 100;
+                const direction = Math.random() > 0.5 ? 1 : -1;
+                dot.style.width = size + 'px';
+                dot.style.height = size + 'px';
+                dot.style.left = startX + '%';
+                dot.style.animationDuration = duration + 's';
+                dot.style.animationDelay = delay + 's';
+                dot.style.setProperty('--direction', direction);
+                container.appendChild(dot);
+            }
+        }
+        
         createFloatingDots();
         loadData();
         initMusic();
-        
-        // Rafraîchissement automatique toutes les 10 secondes
-        setInterval(() => { loadData(); }, 10000);
+        setInterval(() => { loadData(); }, 5000);
         
         const style = document.createElement('style');
         style.textContent = `@keyframes fadeOut { 0% { opacity: 1; transform: translateX(-50%) translateY(0); } 70% { opacity: 1; } 100% { opacity: 0; transform: translateX(-50%) translateY(-20px); } }`;
@@ -732,3 +781,4 @@ INFO PURGE 24
     </script>
 </body>
 </html>
+info purge 24 la voix de la purge by night , shiro , shadow, William et dianny
