@@ -87,6 +87,23 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             margin: 5px;
         }
         
+        .search-box {
+            background: rgba(0,0,0,0.8);
+            border: 1px solid #ff4444;
+            border-radius: 30px;
+            padding: 10px 20px;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: #ff6666;
+            box-shadow: 0 0 10px rgba(255,0,0,0.3);
+        }
+        
         .current-scores {
             display: flex;
             gap: 20px;
@@ -164,6 +181,32 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             padding: 20px;
             color: #ff8888;
         }
+        
+        .search-info {
+            font-size: 0.8em;
+            color: #ff8888;
+            margin-bottom: 15px;
+        }
+        
+        .edit-btn {
+            background: #3498db;
+            margin-top: 10px;
+        }
+        
+        .edit-btn:hover { background: #2980b9; }
+        
+        .edit-form {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 10px;
+        }
+        
+        .edit-form input, .edit-form textarea {
+            width: 100%;
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
@@ -188,9 +231,14 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             </header>
 
             <div class="info-box">
-                <strong>📌 IMPORTANT :</strong><br>
-                • Cliquez sur "CHARGER DEPUIS GITHUB" pour voir vos clans existants<br>
-                • Ensuite, vous pouvez modifier, ajouter des points, etc.
+                <strong>📌 RECHERCHE :</strong><br>
+                Tapez le nom d'un clan dans la barre de recherche pour le trouver rapidement.
+            </div>
+
+            <!-- BARRE DE RECHERCHE -->
+            <div style="margin: 20px 0;">
+                <input type="text" id="searchInput" class="search-box" placeholder="🔍 Rechercher un clan par son nom..." onkeyup="filterClans()">
+                <div class="search-info" id="searchInfo"></div>
             </div>
 
             <div class="reset-section">
@@ -231,6 +279,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
         let currentData = { clans: [], forum: [] };
         let pendingClans = [];
         let pendingForum = [];
+        let searchTerm = "";
         
         function checkPin() {
             const enteredPin = document.getElementById('pinCode').value;
@@ -296,6 +345,39 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
         function saveData() {
             saveToLocal();
             displayAdmin();
+        }
+        
+        // FONCTION DE RECHERCHE
+        function filterClans() {
+            searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const searchInfo = document.getElementById('searchInfo');
+            const filteredCount = currentData.clans.filter(clan => clan.name.toLowerCase().includes(searchTerm)).length;
+            
+            if (searchTerm === "") {
+                searchInfo.innerHTML = `📋 ${currentData.clans.length} clans au total`;
+            } else {
+                searchInfo.innerHTML = `🔍 ${filteredCount} clan(s) trouvé(s) pour "${searchTerm}"`;
+            }
+            
+            displayAdmin();
+        }
+        
+        // Fonction pour modifier un clan
+        function editClan(id) {
+            const clan = currentData.clans.find(c => c.id === id);
+            if (!clan) return;
+            
+            const newName = prompt("Nouveau nom du clan :", clan.name);
+            if (newName && newName.trim() !== "") clan.name = newName.trim();
+            
+            const newLeader = prompt("Nouveau nom du chef :", clan.leader);
+            if (newLeader && newLeader.trim() !== "") clan.leader = newLeader.trim();
+            
+            const newDesc = prompt("Nouvelle description :", clan.description || "");
+            clan.description = newDesc || "";
+            
+            saveData();
+            alert(`✅ Clan "${clan.name}" modifié !`);
         }
         
         function resetWeekScores() {
@@ -401,6 +483,12 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
         }
         
         function displayAdmin() {
+            // Filtrer les clans selon la recherche
+            let filteredClans = currentData.clans;
+            if (searchTerm !== "") {
+                filteredClans = currentData.clans.filter(clan => clan.name.toLowerCase().includes(searchTerm));
+            }
+            
             // Données en attente
             const pendingContainer = document.getElementById('pendingContainer');
             let pendingHtml = '';
@@ -439,27 +527,30 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             }
             pendingContainer.innerHTML = pendingHtml;
             
-            // Liste des clans
+            // Liste des clans avec bouton modifier
             const clansContainer = document.getElementById('clansList');
             if(currentData.clans.length === 0) {
                 clansContainer.innerHTML = '<div class="loading">📭 Aucun clan. Cliquez sur "CHARGER DEPUIS GITHUB" ou ajoutez-en un.</div>';
+            } else if (filteredClans.length === 0 && searchTerm !== "") {
+                clansContainer.innerHTML = `<div class="loading">🔍 Aucun clan trouvé pour "${searchTerm}"</div>`;
             } else {
-                clansContainer.innerHTML = currentData.clans.map(clan => `
+                clansContainer.innerHTML = filteredClans.map(clan => `
                     <div class="clan-card">
                         <strong>⚔️ ${escapeHtml(clan.name)}</strong> - Chef: ${escapeHtml(clan.leader)}<br>
                         📝 ${escapeHtml(clan.description) || "Aucune description"}<br>
                         ❤️ ${clan.likes || 0} likes<br>
+                        <button onclick="editClan(${clan.id})" class="edit-btn">✏️ MODIFIER</button>
                         <button onclick="deleteClan(${clan.id})" class="delete-btn">🗑️ SUPPRIMER</button>
                     </div>
                 `).join('');
             }
             
-            // Ajout aux 3 classements
+            // Ajout aux 3 classements (filtré aussi)
             const scoreContainer = document.getElementById('scoreInputs');
             if(currentData.clans.length === 0) {
                 scoreContainer.innerHTML = '<div class="loading">Chargez d\'abord les clans</div>';
             } else {
-                scoreContainer.innerHTML = currentData.clans.map(clan => `
+                scoreContainer.innerHTML = filteredClans.map(clan => `
                     <div class="clan-card">
                         <strong>⚔️ ${escapeHtml(clan.name)}</strong>
                         <div class="current-scores">
@@ -475,12 +566,12 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
                 `).join('');
             }
             
-            // Ajout uniquement à l'année
+            // Ajout uniquement à l'année (filtré aussi)
             const yearContainer = document.getElementById('yearScoreInputs');
             if(currentData.clans.length === 0) {
                 yearContainer.innerHTML = '<div class="loading">Chargez d\'abord les clans</div>';
             } else {
-                yearContainer.innerHTML = currentData.clans.map(clan => `
+                yearContainer.innerHTML = filteredClans.map(clan => `
                     <div class="clan-card year-note">
                         <strong>⚔️ ${escapeHtml(clan.name)}</strong>
                         <div class="current-scores">
