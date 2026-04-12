@@ -103,6 +103,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
         .delete-btn { background: #cc0000; }
         .reset-btn { background: #f39c12; color: #1a1a2e; }
         .reset-btn:hover { background: #e67e22; }
+        .year-btn { background: #e74c3c; }
         
         .error { color: #ff8888; margin-top: 10px; }
         
@@ -152,6 +153,11 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             border-radius: 12px;
             margin-bottom: 20px;
         }
+        
+        .year-note {
+            border-left: 3px solid #e74c3c;
+            background: rgba(231,76,60,0.1);
+        }
     </style>
 </head>
 <body>
@@ -171,23 +177,21 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
                 <p>Bienvenue Joyboy</p>
                 <button onclick="logout()">🚪 Déconnexion</button>
                 <a href="index.html"><button>🏠 Voir le site</button></a>
-                <button onclick="syncAllData()" style="background:#27ae60;">🔄 SYNC LIKES & DONNÉES</button>
-                <button onclick="exportData()" style="background:#3498db;">💾 EXPORTER data.json</button>
+                <button onclick="syncAndExport()" style="background:#27ae60;">🔄 SYNC & EXPORTER</button>
             </header>
 
             <div class="info-box">
-                <strong>📌 LIKES EN ATTENTE :</strong><br>
-                Les likes des visiteurs sont stockés localement. Cliquez sur "SYNC LIKES & DONNÉES" pour les intégrer.
+                <strong>📌 GESTION DES NOTES :</strong><br>
+                • "AJOUTER AUX 3 CLASSEMENTS" → ajoute aux Semaine, Mois, Année<br>
+                • "AJOUTER À L'ANNÉE" → ajoute uniquement au classement Annuel
             </div>
 
-            <!-- SECTION RÉINITIALISATION -->
             <div class="reset-section">
                 <button onclick="resetWeekScores()" class="reset-btn" style="background:#e74c3c;">🔄 RÉINITIALISER SEMAINE</button>
                 <button onclick="resetMonthScores()" class="reset-btn" style="background:#e67e22;">🔄 RÉINITIALISER MOIS</button>
                 <button onclick="resetYearScores()" class="reset-btn" style="background:#f1c40f;">🔄 RÉINITIALISER ANNÉE</button>
             </div>
 
-            <!-- Formulaire pour ajouter un nouveau clan -->
             <div class="add-clan-form">
                 <h2>📝 ENREGISTRER UN NOUVEAU CLAN</h2>
                 <input type="text" id="newClanName" placeholder="Nom du clan" style="width:100%;">
@@ -196,16 +200,17 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
                 <button onclick="addNewClan()" style="background:#27ae60;">✅ AJOUTER CE CLAN</button>
             </div>
 
-            <!-- Liste des clans existants -->
             <h2>📋 LISTE DES CLANS</h2>
             <div id="clansList"></div>
 
-            <!-- Ajout de points -->
-            <h2>⭐ AJOUTER DES POINTS</h2>
-            <p style="margin-bottom:15px;">⚠️ Les points s'ajoutent automatiquement aux 3 classements (Semaine, Mois, Année)</p>
+            <h2>⭐ AJOUTER AUX 3 CLASSEMENTS</h2>
+            <p style="margin-bottom:15px;">⚠️ Ajoute aux classements : SEMAINE + MOIS + ANNÉE</p>
             <div id="scoreInputs"></div>
 
-            <!-- Données en attente -->
+            <h2>🎯 AJOUTER UNIQUEMENT À L'ANNÉE</h2>
+            <p style="margin-bottom:15px;">⚠️ Ces points vont uniquement dans le classement ANNUEL</p>
+            <div id="yearScoreInputs"></div>
+
             <h2>📋 DONNÉES EN ATTENTE</h2>
             <div id="pendingContainer"></div>
         </div>
@@ -213,7 +218,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
 
     <script>
         const ADMIN_PIN = "2007";
-        const STORAGE_KEY = "infopurge24_data";
+        const STORAGE_KEY = "infopurge24_admin_data";
         
         let currentData = { clans: [], forum: [] };
         let pendingClans = [];
@@ -263,7 +268,6 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             displayAdmin();
         }
         
-        // RÉINITIALISATION DES SCORES
         function resetWeekScores() {
             if(confirm("⚠️ Réinitialiser TOUS les scores de la SEMAINE ?")) {
                 currentData.clans.forEach(clan => { clan.score_week = 0; });
@@ -288,57 +292,50 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             }
         }
         
-        // SYNC DES LIKES ET DONNÉES
-        function syncAllData() {
-            let synced = false;
-            
-            // Récupérer les likes des clans en attente
-            for(let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if(key && key.startsWith('pending_clan_likes_')) {
-                    const clanId = parseInt(key.replace('pending_clan_likes_', ''));
-                    const newLikes = parseInt(localStorage.getItem(key));
-                    const clan = currentData.clans.find(c => c.id === clanId);
-                    if(clan) {
-                        clan.likes = newLikes;
-                        localStorage.removeItem(key);
-                        synced = true;
-                    }
-                }
-                if(key && key.startsWith('pending_msg_likes_')) {
-                    const msgId = parseInt(key.replace('pending_msg_likes_', ''));
-                    const newLikes = parseInt(localStorage.getItem(key));
-                    const msg = currentData.forum.find(m => m.id === msgId);
-                    if(msg) {
-                        msg.likes = newLikes;
-                        localStorage.removeItem(key);
-                        synced = true;
-                    }
-                }
+        function syncAndExport() {
+            let pendingClanLikes = JSON.parse(localStorage.getItem('pending_clan_likes') || '[]');
+            for(let like of pendingClanLikes) {
+                const clan = currentData.clans.find(c => c.id === like.id);
+                if(clan) clan.likes = like.likes;
             }
+            localStorage.removeItem('pending_clan_likes');
             
-            // Ajouter les nouveaux clans en attente
+            let pendingMsgLikes = JSON.parse(localStorage.getItem('pending_msg_likes') || '[]');
+            for(let like of pendingMsgLikes) {
+                const msg = currentData.forum.find(m => m.id === like.id);
+                if(msg) msg.likes = like.likes;
+            }
+            localStorage.removeItem('pending_msg_likes');
+            
             if(pendingClans.length > 0) {
                 currentData.clans = [...pendingClans, ...currentData.clans];
                 pendingClans = [];
                 localStorage.setItem('pending_clans', JSON.stringify(pendingClans));
-                synced = true;
             }
             
-            // Ajouter les nouveaux messages
             if(pendingForum.length > 0) {
                 currentData.forum = [...pendingForum, ...currentData.forum];
                 pendingForum = [];
                 localStorage.setItem('pending_forum', JSON.stringify(pendingForum));
-                synced = true;
             }
             
-            if(synced) {
-                saveData();
-                alert("✅ Données synchronisées ! N'oubliez pas d'exporter vers GitHub.");
-            } else {
-                alert("📭 Aucune donnée en attente.");
-            }
+            saveData();
+            
+            const fullData = {
+                clans: currentData.clans,
+                forum: currentData.forum
+            };
+            
+            const dataStr = JSON.stringify(fullData, null, 2);
+            const blob = new Blob([dataStr], {type: "application/json"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'data.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert("✅ Données synchronisées et exportées !\n\n1. Allez sur GitHub\n2. Ouvrez data.json\n3. Copiez-collez le contenu\n4. Commit changes");
         }
         
         function addNewClan() {
@@ -370,13 +367,17 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             document.getElementById('newClanLeader').value = '';
             document.getElementById('newClanDesc').value = '';
             
-            alert(`✅ Clan "${name}" ajouté ! N'oubliez pas d'exporter.`);
+            alert(`✅ Clan "${name}" ajouté !`);
         }
         
         function displayAdmin() {
-            // Afficher les données en attente
+            // Données en attente
             const pendingContainer = document.getElementById('pendingContainer');
             let pendingHtml = '';
+            
+            let pendingClanLikes = JSON.parse(localStorage.getItem('pending_clan_likes') || '[]');
+            let pendingMsgLikes = JSON.parse(localStorage.getItem('pending_msg_likes') || '[]');
+            let pendingLikesCount = pendingClanLikes.length + pendingMsgLikes.length;
             
             if(pendingClans.length > 0) {
                 pendingHtml += `<div class="pending-data">
@@ -396,19 +397,10 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
                 </div>`;
             }
             
-            // Vérifier les likes en attente
-            let pendingLikesCount = 0;
-            for(let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if(key && (key.startsWith('pending_clan_likes_') || key.startsWith('pending_msg_likes_'))) {
-                    pendingLikesCount++;
-                }
-            }
-            
             if(pendingLikesCount > 0) {
                 pendingHtml += `<div class="pending-data">
                     <strong>❤️ LIKES EN ATTENTE (${pendingLikesCount}) :</strong><br>
-                    Cliquez sur "SYNC LIKES & DONNÉES" pour les appliquer.
+                    Cliquez sur "SYNC & EXPORTER" pour les appliquer.
                 </div>`;
             }
             
@@ -420,7 +412,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             // Liste des clans
             const clansContainer = document.getElementById('clansList');
             if(currentData.clans.length === 0) {
-                clansContainer.innerHTML = '<p>Aucun clan. Utilisez le formulaire ci-dessus pour en ajouter.</p>';
+                clansContainer.innerHTML = '<p>Aucun clan. Utilisez le formulaire ci-dessus.</p>';
             } else {
                 clansContainer.innerHTML = currentData.clans.map(clan => `
                     <div class="clan-card">
@@ -432,7 +424,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
                 `).join('');
             }
             
-            // Ajout de points
+            // Ajout aux 3 classements (Semaine, Mois, Année)
             const scoreContainer = document.getElementById('scoreInputs');
             if(currentData.clans.length === 0) {
                 scoreContainer.innerHTML = '<p>Créez d\'abord des clans.</p>';
@@ -447,7 +439,26 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
                         </div>
                         <div style="margin-top:15px;">
                             <input type="number" id="points_${clan.id}" placeholder="Points" style="width:150px;">
-                            <button onclick="addPoints(${clan.id})">➕ AJOUTER</button>
+                            <button onclick="addPointsToAll(${clan.id})">➕ AJOUTER AUX 3 CLASSEMENTS</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            // Ajout uniquement à l'année
+            const yearContainer = document.getElementById('yearScoreInputs');
+            if(currentData.clans.length === 0) {
+                yearContainer.innerHTML = '<p>Créez d\'abord des clans.</p>';
+            } else {
+                yearContainer.innerHTML = currentData.clans.map(clan => `
+                    <div class="clan-card year-note">
+                        <strong>⚔️ ${escapeHtml(clan.name)}</strong>
+                        <div class="current-scores">
+                            <span>🗓️ ANNÉE ACTUELLE: ${clan.score_year || 0} pts</span>
+                        </div>
+                        <div style="margin-top:15px;">
+                            <input type="number" id="year_points_${clan.id}" placeholder="Points Année" style="width:150px;">
+                            <button onclick="addPointsToYear(${clan.id})" class="year-btn">🎯 AJOUTER À L'ANNÉE</button>
                         </div>
                     </div>
                 `).join('');
@@ -493,7 +504,8 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             }
         }
         
-        function addPoints(id) {
+        // Ajouter aux 3 classements (Semaine, Mois, Année)
+        function addPointsToAll(id) {
             const input = document.getElementById(`points_${id}`);
             const points = parseInt(input.value);
             if(!isNaN(points) && points > 0) {
@@ -503,7 +515,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
                     clan.score_month = (clan.score_month || 0) + points;
                     clan.score_year = (clan.score_year || 0) + points;
                     saveData();
-                    alert(`✅ ${points} points ajoutés à ${clan.name} !`);
+                    alert(`✅ ${points} points ajoutés à ${clan.name} dans les 3 classements !`);
                 }
                 input.value = '';
             } else {
@@ -511,22 +523,21 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             }
         }
         
-        function exportData() {
-            const fullData = {
-                clans: currentData.clans,
-                forum: currentData.forum
-            };
-            
-            const dataStr = JSON.stringify(fullData, null, 2);
-            const blob = new Blob([dataStr], {type: "application/json"});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'data.json';
-            a.click();
-            URL.revokeObjectURL(url);
-            
-            alert(`✅ Fichier data.json téléchargé !\n\nÉTAPES :\n1. Allez sur GitHub\n2. Cliquez sur data.json\n3. Cliquez sur le crayon (modifier)\n4. Copiez-collez le contenu\n5. Cliquez sur "Commit changes"\n\n🔥 Les likes et les données seront visibles par tous !`);
+        // Ajouter uniquement à l'année
+        function addPointsToYear(id) {
+            const input = document.getElementById(`year_points_${id}`);
+            const points = parseInt(input.value);
+            if(!isNaN(points) && points > 0) {
+                const clan = currentData.clans.find(c => c.id === id);
+                if(clan) {
+                    clan.score_year = (clan.score_year || 0) + points;
+                    saveData();
+                    alert(`✅ ${points} points ajoutés à ${clan.name} dans le classement ANNÉE !`);
+                }
+                input.value = '';
+            } else {
+                alert('❌ Entrez un nombre valide');
+            }
         }
         
         function escapeHtml(str) {
