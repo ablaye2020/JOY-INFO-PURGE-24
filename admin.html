@@ -158,6 +158,12 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             border-left: 3px solid #e74c3c;
             background: rgba(231,76,60,0.1);
         }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #ff8888;
+        }
     </style>
 </head>
 <body>
@@ -177,13 +183,14 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
                 <p>Bienvenue Joyboy</p>
                 <button onclick="logout()">🚪 Déconnexion</button>
                 <a href="index.html"><button>🏠 Voir le site</button></a>
+                <button onclick="loadDataFromGitHub()" style="background:#3498db;">📥 CHARGER DEPUIS GITHUB</button>
                 <button onclick="syncAndExport()" style="background:#27ae60;">🔄 SYNC & EXPORTER</button>
             </header>
 
             <div class="info-box">
-                <strong>📌 GESTION DES NOTES :</strong><br>
-                • "AJOUTER AUX 3 CLASSEMENTS" → ajoute aux Semaine, Mois, Année<br>
-                • "AJOUTER À L'ANNÉE" → ajoute uniquement au classement Annuel
+                <strong>📌 IMPORTANT :</strong><br>
+                • Cliquez sur "CHARGER DEPUIS GITHUB" pour voir vos clans existants<br>
+                • Ensuite, vous pouvez modifier, ajouter des points, etc.
             </div>
 
             <div class="reset-section">
@@ -200,16 +207,16 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
                 <button onclick="addNewClan()" style="background:#27ae60;">✅ AJOUTER CE CLAN</button>
             </div>
 
-            <h2>📋 LISTE DES CLANS</h2>
-            <div id="clansList"></div>
+            <h2>📋 LISTE DES CLANS EXISTANTS</h2>
+            <div id="clansList"><div class="loading">Cliquez sur "CHARGER DEPUIS GITHUB"</div></div>
 
             <h2>⭐ AJOUTER AUX 3 CLASSEMENTS</h2>
             <p style="margin-bottom:15px;">⚠️ Ajoute aux classements : SEMAINE + MOIS + ANNÉE</p>
-            <div id="scoreInputs"></div>
+            <div id="scoreInputs"><div class="loading">Chargez d'abord les clans</div></div>
 
             <h2>🎯 AJOUTER UNIQUEMENT À L'ANNÉE</h2>
             <p style="margin-bottom:15px;">⚠️ Ces points vont uniquement dans le classement ANNUEL</p>
-            <div id="yearScoreInputs"></div>
+            <div id="yearScoreInputs"><div class="loading">Chargez d'abord les clans</div></div>
 
             <h2>📋 DONNÉES EN ATTENTE</h2>
             <div id="pendingContainer"></div>
@@ -218,6 +225,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
 
     <script>
         const ADMIN_PIN = "2007";
+        const DATA_URL = "https://raw.githubusercontent.com/ablaye2020/info-purge-24/main/data.json";
         const STORAGE_KEY = "infopurge24_admin_data";
         
         let currentData = { clans: [], forum: [] };
@@ -230,7 +238,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
                 localStorage.setItem('adminLoggedIn', 'true');
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'block';
-                loadData();
+                loadLocalData();
             } else {
                 document.getElementById('loginError').innerText = '❌ Code incorrect';
                 document.getElementById('pinCode').value = '';
@@ -240,7 +248,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
         if(localStorage.getItem('adminLoggedIn') === 'true') {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
-            loadData();
+            loadLocalData();
         }
         
         function logout() {
@@ -249,7 +257,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             document.getElementById('adminPanel').style.display = 'none';
         }
         
-        function loadData() {
+        function loadLocalData() {
             const saved = localStorage.getItem(STORAGE_KEY);
             if(saved) {
                 currentData = JSON.parse(saved);
@@ -263,8 +271,30 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             displayAdmin();
         }
         
-        function saveData() {
+        async function loadDataFromGitHub() {
+            try {
+                document.getElementById('clansList').innerHTML = '<div class="loading">⏳ Chargement depuis GitHub...</div>';
+                const response = await fetch(DATA_URL + "?t=" + Date.now());
+                if (!response.ok) throw new Error("Fichier non trouvé");
+                const data = await response.json();
+                currentData = data;
+                if (!currentData.clans) currentData.clans = [];
+                if (!currentData.forum) currentData.forum = [];
+                saveToLocal();
+                displayAdmin();
+                alert(`✅ ${currentData.clans.length} clans chargés depuis GitHub !`);
+            } catch(e) {
+                alert("❌ Erreur de chargement: " + e.message);
+                displayAdmin();
+            }
+        }
+        
+        function saveToLocal() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData));
+        }
+        
+        function saveData() {
+            saveToLocal();
             displayAdmin();
         }
         
@@ -412,7 +442,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             // Liste des clans
             const clansContainer = document.getElementById('clansList');
             if(currentData.clans.length === 0) {
-                clansContainer.innerHTML = '<p>Aucun clan. Utilisez le formulaire ci-dessus.</p>';
+                clansContainer.innerHTML = '<div class="loading">📭 Aucun clan. Cliquez sur "CHARGER DEPUIS GITHUB" ou ajoutez-en un.</div>';
             } else {
                 clansContainer.innerHTML = currentData.clans.map(clan => `
                     <div class="clan-card">
@@ -424,10 +454,10 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
                 `).join('');
             }
             
-            // Ajout aux 3 classements (Semaine, Mois, Année)
+            // Ajout aux 3 classements
             const scoreContainer = document.getElementById('scoreInputs');
             if(currentData.clans.length === 0) {
-                scoreContainer.innerHTML = '<p>Créez d\'abord des clans.</p>';
+                scoreContainer.innerHTML = '<div class="loading">Chargez d\'abord les clans</div>';
             } else {
                 scoreContainer.innerHTML = currentData.clans.map(clan => `
                     <div class="clan-card">
@@ -448,7 +478,7 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             // Ajout uniquement à l'année
             const yearContainer = document.getElementById('yearScoreInputs');
             if(currentData.clans.length === 0) {
-                yearContainer.innerHTML = '<p>Créez d\'abord des clans.</p>';
+                yearContainer.innerHTML = '<div class="loading">Chargez d\'abord les clans</div>';
             } else {
                 yearContainer.innerHTML = currentData.clans.map(clan => `
                     <div class="clan-card year-note">
@@ -504,7 +534,6 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             }
         }
         
-        // Ajouter aux 3 classements (Semaine, Mois, Année)
         function addPointsToAll(id) {
             const input = document.getElementById(`points_${id}`);
             const points = parseInt(input.value);
@@ -523,7 +552,6 @@ INFO PURGE 24 PRODUCTION by joyboy night shiro dianny et shadow
             }
         }
         
-        // Ajouter uniquement à l'année
         function addPointsToYear(id) {
             const input = document.getElementById(`year_points_${id}`);
             const points = parseInt(input.value);
